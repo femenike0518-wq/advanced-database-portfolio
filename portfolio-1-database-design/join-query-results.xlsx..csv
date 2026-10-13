@@ -1,0 +1,4 @@
+"customer_id","full_name","email","account_number","account_type","balance"
+1,"Tosin Amir","tosin@test.com","SWB100001","savings",50000.00
+2,"Daniel Musa","daniel@test.com","SWB100002","current",80000.00
+3,"Grace Bello","grace@test.com","SWB100003","savings",30000.00

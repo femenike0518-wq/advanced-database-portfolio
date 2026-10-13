@@ -1,0 +1,36 @@
+# SwiftBank NoSQL Design Notes
+
+## Database and Collection
+
+I created a MongoDB database named `swiftbank_nosql` and a collection named `customers` using MongoDB Compass.
+
+## Document Model
+
+The customer documents contain the customer ID, full name, email address, and an embedded `accounts` array. The array stores account information, including the account number, account type, and balance.
+
+## Why I Used MongoDB
+
+MongoDB stores data as documents. Embedding account details inside a customer document allows related information to be retrieved together without performing a relational JOIN for this example.
+
+## Comparison with PostgreSQL
+
+In my PostgreSQL design, customers and accounts are stored in separate tables connected through a foreign key. In MongoDB, the example stores the customer's account details inside the customer document.
+
+## Testing
+
+I inserted three fictional SwiftBank customers: Tosin Amir, Daniel Musa, and Grace Bello. I used `db.customers.find()` to retrieve the documents and verify the stored records.
+
+## Limitation
+
+This is a small demonstration dataset. A real banking system would need careful decisions about data consistency, account updates, security, and transaction processing before choosing an appropriate data model.
+
+
+## NoSQL Query Test
+
+I queried the `customers` collection to find customers whose embedded account type is `savings`. The query returned Tosin Amir and Grace Bello. Daniel Musa was not returned because his account type is `current`.
+
+## Suitability of the Model
+
+The document model is useful when customer information and related account details need to be retrieved together. Embedding the account information reduces the need for a JOIN for this example.
+
+However, a real banking system must carefully consider data consistency, concurrent updates, security, and transaction requirements. The model used here is a small coursework demonstration, not a complete banking implementation.

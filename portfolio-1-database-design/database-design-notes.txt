@@ -1,0 +1,35 @@
+SwiftBank Database Design Notes
+
+1. Introduction
+
+SwiftBank is a fictional banking system designed for the MIT 8103 Advanced Database Systems practical portfolio. The database stores customer information, bank account details, and transaction records.
+
+2. Database Tables
+
+The database contains three main tables:
+
+Customers: Stores customer details, including customer ID, full name, email address, phone number, and date of registration.
+
+Accounts: Stores account information, including account ID, customer ID, account number, account type, balance, and creation date.
+
+Transactions: Records deposits, withdrawals, and transfers, including the transaction amount, status, date, and related accounts.
+
+3. Relationships
+
+The Customers and Accounts tables are connected through customer_id. This means a customer can have multiple accounts, while each account belongs to one customer.
+
+The Transactions table references the Accounts table through source_account_id and destination_account_id. These fields identify the accounts involved in withdrawals, deposits, and transfers.
+
+4. Keys and Constraints
+
+Primary keys uniquely identify records in each table. Foreign keys connect related records and help maintain referential integrity.
+
+The database also uses constraints to prevent duplicate email addresses and account numbers, restrict account types to savings or current, require positive transaction amounts, and prevent negative account balances.
+
+5. Normalisation
+
+The design separates customer information, account information, and transaction records into different tables. This reduces unnecessary duplication and makes the data easier to maintain. Customer details do not need to be repeated for every account, and account details are stored separately from transaction records.
+
+6. Conclusion
+
+The SwiftBank database provides a structured foundation for managing customers, accounts, and transactions. Its relationships, keys, and constraints demonstrate important relational database design principles.

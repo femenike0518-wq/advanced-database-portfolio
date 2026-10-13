@@ -1,0 +1,12 @@
+# SwiftBank Transaction and Concurrency Notes
+
+## Rollback
+A transaction was started using BEGIN, and the balance of account 1 was temporarily increased by 100. The ROLLBACK command cancelled the uncommitted change. The final balance returned to 50,000.00.
+
+## Commit
+The COMMIT command was tested with an update statement on a customer record. The transaction completed successfully, and the customer record remained available.
+
+## Transaction Isolation
+PostgreSQL reported READ COMMITTED as the current transaction isolation level. During the two-session test, Session A made an uncommitted update to account 1, while Session B continued to see the original committed balance of 50,000.00.
+
+The test demonstrated that Session B could not see Session A's uncommitted change. After the test transaction was rolled back, the account balance remained at 50,000.00.

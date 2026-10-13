@@ -1,0 +1,32 @@
+ Performance Comparison: Before and After Indexing
+
+The baseline query was executed using EXPLAIN ANALYZE and recorded an execution time of 0.108 ms. After creating an index on the balance column of the accounts table, the same query recorded an execution time of 0.133 ms.
+
+The second execution was slightly slower, and the execution plan did not demonstrate that the new balance index was used. This may be because the database contains only a small number of records, making a sequential scan efficient enough for PostgreSQL's planner.
+
+The experiment shows that creating an index does not automatically improve query performance. The effect of an index depends on factors such as table size, data distribution, and query conditions.
+
+
+ Balance-Filter Query
+
+I tested a query that retrieves accounts with balances greater than 40,000 without joining it to the customers table. The execution plan showed a sequential scan on the accounts table, returned two rows, and removed one row using the filter.
+
+The recorded execution time was 0.142 ms. PostgreSQL did not use the newly created balance index for this query. Since the table contains only a small number of records, a sequential scan may be a reasonable choice.
+
+This result supports the observation that query performance depends on the size of the dataset and the execution plan selected by the database.
+
+
+ Index Verification
+
+I queried the PostgreSQL `pg_indexes` system view to verify the indexes on the accounts table. The results confirmed the presence of the primary-key index, the unique account-number index, and the newly created `idx_accounts_balance` index.
+
+Although the balance index exists, PostgreSQL used a sequential scan for the balance-filter query. The small number of records may make a sequential scan more efficient than using an index. This demonstrates that index creation alone does not guarantee improved query performance.
+
+
+Account Balance Summary
+
+I used an aggregate SQL query to group accounts by account type. The query used COUNT() to count the accounts, SUM() to calculate total balances, and AVG() to calculate average balances.
+
+The results showed one current account with a total balance of 80,000 and an average balance of 80,000. There were two savings accounts with a combined balance of 80,000 and an average balance of 40,000.
+
+This query demonstrates how SQL aggregate functions and GROUP BY can summarise account data for reporting and analysis.
