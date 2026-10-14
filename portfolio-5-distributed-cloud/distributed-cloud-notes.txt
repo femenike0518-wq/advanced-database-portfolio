@@ -1,0 +1,22 @@
+# SwiftBank Distributed and Cloud Database Notes
+
+## 1. Case Study
+SwiftBank is a fictional banking system that stores customer details, bank accounts, balances, and transactions.
+
+## 2. Purpose of Distributed Databases
+A distributed database stores data across multiple connected database servers or locations. This can improve availability, support growth, and help a system continue operating when one server becomes unavailable.
+
+## 3. Replication
+Replication maintains copies of data on multiple database servers. For SwiftBank, a replica could support read requests or help with recovery if the primary server fails. Replication must be configured carefully to avoid stale or conflicting account information.
+
+## 4. Sharding
+Sharding divides a database into smaller parts across servers. SwiftBank could partition data by customer or account range as its data grows. The design must ensure that transactions involving multiple shards remain correct.
+
+## 5. Consistency and Availability
+Banking balances must remain accurate. SwiftBank should prioritise correct transaction processing and use appropriate consistency controls when handling deposits, withdrawals, and transfers. Replicas and failover arrangements can improve availability, but they must not allow conflicting balance updates.
+
+## 6. Practical Work
+The practical exercise and evidence will be documented separately after implementation and testing.
+
+## 7. Conclusion
+A distributed database design could help SwiftBank scale and recover from server failures. However, replication, partitioning, transaction coordination, security, and recovery procedures must be designed and tested carefully.

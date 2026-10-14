@@ -1,0 +1,14 @@
+# SwiftBank Distributed Database Architecture
+
+## Proposed design
+The SwiftBank application connects to a primary PostgreSQL server. The primary processes account updates and banking transactions. A standby server receives replicated database changes and can support recovery if the primary fails.
+
+## Current implementation status
+The practical checks confirmed that the local SwiftBank database runs on PostgreSQL 18.6. The server returned false for pg_is_in_recovery(), and pg_stat_replication returned no connected standby rows. Therefore, replication is not currently configured or active.
+
+## Design considerations
+Replication must be configured and tested before claiming that a standby is available. SwiftBank must also consider replication lag, backup and recovery procedures, secure connections, and transaction consistency. A banking system must prevent incorrect or conflicting balance updates during failover.
+
+## Replication Configuration Check
+
+I inspected the PostgreSQL replication-related settings. The results showed `wal_level = replica`, `max_wal_senders = 10`, and `hot_standby = on`. These settings support the configuration of PostgreSQL replication, but they do not confirm that a standby server is connected. My earlier check of `pg_stat_replication` returned no connected standby rows. Therefore, a working replica and failover have not yet been demonstrated.
