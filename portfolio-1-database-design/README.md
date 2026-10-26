@@ -39,3 +39,23 @@ The SQL was run against the SwiftBank sample database. The table and query scree
 ## Scope
 
 This is a coursework design using sample data. It demonstrates the documented schema and relationships; it is not a production banking system.
+
+
+## Transaction Account Relationships
+
+The `transactions` table references the `accounts` table through
+`source_account_id` and `destination_account_id`. These are foreign keys
+to `accounts.account_id`. Their use depends on the transaction type.
+
+- **Deposit:** `source_account_id` is NULL because the funds enter the
+  destination account. `destination_account_id` is required.
+- **Withdrawal:** `source_account_id` is required because the funds leave
+  that account. `destination_account_id` is NULL.
+- **Transfer:** Both account IDs are required, and the source and
+  destination accounts must be different.
+
+The corrected ER diagram shows the optional account relationships.
+The transaction-type rules must also be enforced by the database
+constraints; the diagram alone does not enforce them.
+
+See `swiftbank-er-diagram-corrected.png` for the corrected diagram.
