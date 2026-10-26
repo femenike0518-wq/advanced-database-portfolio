@@ -18,10 +18,10 @@ The schema creates `customers`, `accounts` and `transactions`. Primary keys iden
 
 1. Open the SwiftBank database in pgAdmin's Query Tool.
 2. Run `CREATE TABLE COMMANDS.sql` to create the tables. Skip this step only if the tables already exist.
-3. Run `seed-data.sql` to add the three fictional customers, their accounts and example transactions.
+3. Run `seed-data.sql` to add the three fictional customers and their accounts.
 4. Run `JOIN QUERY.sql` to view the customer and account records shown in the portfolio screenshots.
 
-The seed script uses the unique customer emails and account numbers to avoid inserting duplicate customer and account rows when run more than once. It does not delete existing records. The sample account balances match the saved join output. Transactions have fixed dates to make repeated query results consistent.
+The seed script uses the unique customer emails and account numbers to avoid inserting duplicate customer and account rows when run more than once. It does not delete existing records. The sample account balances match the saved join output.
 
 ## How it was checked
 
@@ -30,7 +30,7 @@ The SQL was run against the SwiftBank sample database. The table and query scree
 ## Files and evidence
 
 - `CREATE TABLE COMMANDS.sql` — table definitions, keys and constraints.
-- `seed-data.sql` — repeatable fictional customer, account and transaction records.
+- `seed-data.sql` — repeatable fictional customer and account records.
 - `JOIN QUERY.sql` and `join-query-results.xlsx..csv` — join query and sample output.
 - `04-swiftbank-er-diagram.png` and `ER Image.png` — ER diagram evidence.
 - `database-design-notes.txt` — case study, relationships and design notes.

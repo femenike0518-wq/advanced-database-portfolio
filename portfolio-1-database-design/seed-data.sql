@@ -28,44 +28,6 @@ FROM (VALUES
 JOIN customers AS c ON c.email = seed.email
 ON CONFLICT (account_number) DO NOTHING;
 
--- Sample activity corresponding to the seeded accounts. Dates are fixed so
--- screenshots and query results remain consistent between runs.
-INSERT INTO transactions (
-    source_account_id,
-    destination_account_id,
-    transaction_type,
-    amount,
-    status,
-    transaction_date
-)
-SELECT
-    source.account_id,
-    destination.account_id,
-    seed.transaction_type,
-    seed.amount,
-    seed.status,
-    seed.transaction_date
-FROM (VALUES
-    (NULL::VARCHAR(20), 'SWB100001', 'deposit',    10000.00::NUMERIC(15, 2), 'completed', TIMESTAMP '2025-01-10 09:00:00'),
-    ('SWB100002', NULL::VARCHAR(20), 'withdrawal',  5000.00::NUMERIC(15, 2), 'completed', TIMESTAMP '2025-01-11 10:30:00'),
-    ('SWB100001', 'SWB100003',       'transfer',    2500.00::NUMERIC(15, 2), 'completed', TIMESTAMP '2025-01-12 14:15:00')
-) AS seed(source_account_number, destination_account_number, transaction_type, amount, status, transaction_date)
-LEFT JOIN accounts AS source
-    ON source.account_number = seed.source_account_number
-LEFT JOIN accounts AS destination
-    ON destination.account_number = seed.destination_account_number
-WHERE (seed.source_account_number IS NULL OR source.account_id IS NOT NULL)
-  AND (seed.destination_account_number IS NULL OR destination.account_id IS NOT NULL)
-  AND NOT EXISTS (
-      SELECT 1
-      FROM transactions AS existing
-      WHERE existing.transaction_type = seed.transaction_type
-        AND existing.amount = seed.amount
-        AND existing.transaction_date = seed.transaction_date
-        AND existing.source_account_id IS NOT DISTINCT FROM source.account_id
-        AND existing.destination_account_id IS NOT DISTINCT FROM destination.account_id
-  );
-
 COMMIT;
 
 
