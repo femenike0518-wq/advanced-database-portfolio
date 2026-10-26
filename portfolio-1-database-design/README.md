@@ -7,12 +7,21 @@ This practical designs a relational database for the fictional SwiftBank case st
 ## Tools
 
 - PostgreSQL and pgAdmin
-- SQL for table definitions and queries
+- SQL for table definitions, seed data and queries
 - ER diagram and screenshots as evidence
 
 ## Implementation
 
 The schema creates `customers`, `accounts` and `transactions`. Primary keys identify rows, foreign keys connect related records, and the defined `UNIQUE`, `NOT NULL` and `CHECK` constraints enforce the rules in the schema. The ER diagram documents the relationships, including a customer having multiple accounts. A join query retrieves customer and account information together.
+
+## Recreate the sample records
+
+1. Open the SwiftBank database in pgAdmin's Query Tool.
+2. Run `CREATE TABLE COMMANDS.sql` to create the tables. Skip this step only if the tables already exist.
+3. Run `seed-data.sql` to add the three fictional customers, their accounts and example transactions.
+4. Run `JOIN QUERY.sql` to view the customer and account records shown in the portfolio screenshots.
+
+The seed script uses the unique customer emails and account numbers to avoid inserting duplicate customer and account rows when run more than once. It does not delete existing records. The sample account balances match the saved join output. Transactions have fixed dates to make repeated query results consistent.
 
 ## How it was checked
 
@@ -21,6 +30,7 @@ The SQL was run against the SwiftBank sample database. The table and query scree
 ## Files and evidence
 
 - `CREATE TABLE COMMANDS.sql` — table definitions, keys and constraints.
+- `seed-data.sql` — repeatable fictional customer, account and transaction records.
 - `JOIN QUERY.sql` and `join-query-results.xlsx..csv` — join query and sample output.
 - `04-swiftbank-er-diagram.png` and `ER Image.png` — ER diagram evidence.
 - `database-design-notes.txt` — case study, relationships and design notes.
