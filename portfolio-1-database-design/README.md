@@ -59,3 +59,13 @@ The transaction-type rules must also be enforced by the database
 constraints; the diagram alone does not enforce them.
 
 See `swiftbank-er-diagram-corrected.png` for the corrected diagram.
+
+## Normalisation
+
+The design applies the main ideas of 1NF, 2NF and 3NF to keep customer, account and transaction facts organised:
+
+- **First Normal Form (1NF):** Each column stores one value for each row. For example, an account has one `account_number` and one `account_type` in `accounts`; a customer's multiple accounts are stored as separate rows linked by `customer_id`, rather than as repeating account columns in `customers`. In `transactions`, the source and destination are separate account ID columns, each holding one ID or `NULL` as required by the transaction type.
+- **Second Normal Form (2NF):** Each table uses a single-column primary key (`customer_id`, `account_id` or `transaction_id`). The other columns in each table describe the row identified by that key, so there are no partial dependencies on part of a composite primary key in this design. For example, `amount`, `status` and `transaction_date` describe the transaction identified by `transaction_id`.
+- **Third Normal Form (3NF):** Customer details are kept in `customers`, account details in `accounts`, and transaction details in `transactions`; foreign keys connect these records. For example, `full_name` and `email` are stored with `customer_id` in `customers`, rather than copied into every account or transaction. If a customer's email changes, it can be updated in one customer row instead of in multiple related rows. This separation avoids that repeated-data update problem and keeps each table's non-key facts about its own entity.
+
+These examples describe how the submitted schema is organised. A formal proof of a normal form would require stating and checking all functional dependencies and candidate keys; the table structure alone does not establish every possible dependency.
