@@ -10,16 +10,32 @@ This practical designs a relational database for the fictional SwiftBank case st
 - SQL for table definitions, seed data and queries
 - ER diagram and screenshots as evidence
 
+## Folder layout
+
+- `sql/` — scripts in run order
+- `evidence/` — screenshots, the join-query result file, and ER diagrams
+- `database-design-notes.txt` — case study, relationships and design notes
+
 ## Implementation
 
 The schema creates `customers`, `accounts` and `transactions`. Primary keys identify rows, foreign keys connect related records, and the defined `UNIQUE`, `NOT NULL` and `CHECK` constraints enforce the rules in the schema. The ER diagram documents the relationships, including a customer having multiple accounts. A join query retrieves customer and account information together.
 
+## Which ER diagram is final
+
+The final ER diagram is `evidence/er-diagram-final.png` (renamed from `swiftbank-er-diagram-corrected.png`). It shows the optional source and destination account relationships on `transactions`.
+
+Earlier drawings are kept only as superseded drafts:
+
+- `evidence/er-diagram-draft.png`
+- `evidence/er-diagram-draft-alt.png`
+- `evidence/er-diagram-superseded.png`
+
 ## Recreate the sample records
 
 1. Open the SwiftBank database in pgAdmin's Query Tool.
-2. Run `CREATE TABLE COMMANDS.sql` to create the tables. Skip this step only if the tables already exist.
-3. Run `seed-data.sql` to add the three fictional customers and their accounts.
-4. Run `JOIN QUERY.sql` to view the customer and account records shown in the portfolio screenshots.
+2. Run `sql/01-create-tables.sql` to create the tables. Skip this step only if the tables already exist.
+3. Run `sql/02-seed-data.sql` to add the three fictional customers and their accounts.
+4. Run `sql/03-join-query.sql` to view the customer and account records shown in the portfolio screenshots.
 
 The seed script uses the unique customer emails and account numbers to avoid inserting duplicate customer and account rows when run more than once. It does not delete existing records. The sample account balances match the saved join output.
 
@@ -29,12 +45,13 @@ The SQL was run against the SwiftBank sample database. The table and query scree
 
 ## Files and evidence
 
-- `CREATE TABLE COMMANDS.sql` — table definitions, keys and constraints.
-- `seed-data.sql` — repeatable fictional customer and account records.
-- `JOIN QUERY.sql` and `join-query-results.xlsx..csv` — join query and sample output.
-- `04-swiftbank-er-diagram.png` and `ER Image.png` — ER diagram evidence.
+- `sql/01-create-tables.sql` — table definitions, keys and constraints.
+- `sql/02-seed-data.sql` — repeatable fictional customer and account records.
+- `sql/03-join-query.sql` — customer–account join used in the screenshots.
+- `join-query-results.xlsx..csv` — saved join output (this filename is still waiting to be renamed to `evidence/join-query-results.csv` because Excel currently has the file open).
+- `evidence/er-diagram-final.png` — final ER diagram.
+- `evidence/01-customer-account-results.png`, `evidence/02-database-tables.png`, `evidence/03a-create-customers-accounts.png`, `evidence/03b-create-transactions.png` — table creation and query screenshots.
 - `database-design-notes.txt` — case study, relationships and design notes.
-- Numbered screenshots — table creation and query results.
 
 ## Scope
 
@@ -54,11 +71,11 @@ to `accounts.account_id`. Their use depends on the transaction type.
 - **Transfer:** Both account IDs are required, and the source and
   destination accounts must be different.
 
-The corrected ER diagram shows the optional account relationships.
+The final ER diagram shows the optional account relationships.
 The transaction-type rules must also be enforced by the database
 constraints; the diagram alone does not enforce them.
 
-See `swiftbank-er-diagram-corrected.png` for the corrected diagram.
+See `evidence/er-diagram-final.png` for the corrected diagram.
 
 ## Normalisation
 

@@ -14,7 +14,17 @@ SwiftBank is a fictional banking system used throughout this individual practica
 | 4 | NoSQL and advanced data models | [Portfolio 4 README](portfolio-4-nosql/README.md) |
 | 5 | Distributed and cloud database exercise | [Portfolio 5 README](portfolio-5-distributed-cloud/README.md) |
 
-Each portfolio README identifies the work, its evidence and relevant limitations. SQL, notes, result files and screenshots are kept in the corresponding folder.
+Each portfolio README identifies the work, its evidence and relevant limitations.
+
+## Repository map
+
+| Path | Contents |
+| --- | --- |
+| [portfolio-1-database-design/](portfolio-1-database-design/) | Relational schema, seed data, ER diagram. Scripts in `sql/`, screenshots and diagrams in `evidence/`. Final ER: `evidence/er-diagram-final.png`. |
+| [portfolio-2-query-optimisation/](portfolio-2-query-optimisation/) | Query plans and the small-table index experiment. Canonical SQL in `sql/`; earlier one-statement files in `sql/superseded/`; screenshots in `evidence/`. |
+| [portfolio-3-transactions-concurrency/](portfolio-3-transactions-concurrency/) | Commit, rollback and two-session isolation. Script in `sql/`, screenshots in `evidence/`. |
+| [portfolio-4-nosql/](portfolio-4-nosql/) | MongoDB document example. Commands in `mongodb/`, screenshots in `evidence/`. |
+| [portfolio-5-distributed-cloud/](portfolio-5-distributed-cloud/) | Replication-setting inspection and architecture discussion. Queries in `sql/`, screenshots in `evidence/`. |
 
 ## Tools
 
