@@ -10,6 +10,12 @@ This practical demonstrates transaction control and read visibility across two P
 - Two query sessions for the concurrency demonstration
 - SQL transaction commands and screenshots
 
+## Folder layout
+
+- `sql/` — transaction demonstration script
+- `evidence/` — screenshots
+- `transaction-concurrency-notes.txt` — recorded isolation and rollback observations
+
 ## Implementation and observations
 
 The SQL examples use `BEGIN`, `COMMIT` and `ROLLBACK`. For the two-session test, the isolation level was `READ COMMITTED`. Session A changed account 1's balance by 100 but left the transaction uncommitted. While that change was pending, Session B continued to read the prior committed balance of 50,000. Session A then rolled back, and the balance remained 50,000.
@@ -22,9 +28,9 @@ Use two sessions connected to the SwiftBank database. Keep Session A's transacti
 
 ## Files and evidence
 
-- `portfolio-3-transactions-concurrency.sql` — transaction examples and two-session steps.
+- `sql/01-transactions-concurrency.sql` — transaction examples and two-session steps.
 - `transaction-concurrency-notes.txt` — recorded isolation and rollback observations.
-- Numbered screenshots — rollback, commit, Session B's read and restoration of original values.
+- `evidence/01-rollback-demonstration.png`, `evidence/01b-rollback-demonstration.png`, `evidence/02-commit-demonstration.png`, `evidence/03-transaction-isolation.png`, `evidence/04-session-b-uncommitted-read.png`, `evidence/05-rollback-after-concurrency.png`, `evidence/06-visible-commit-demonstration.png`, `evidence/07-original-email-restored.png` — rollback, commit, Session B's read and restoration of original values.
 
 ## Scope
 

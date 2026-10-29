@@ -10,6 +10,12 @@ This practical models SwiftBank customer data in MongoDB and considers how embed
 - MongoDB Compass
 - MongoDB shell commands in JavaScript format
 
+## Folder layout
+
+- `mongodb/` — document insert and query commands
+- `evidence/` — Compass screenshots
+- `nosql-design-notes.txt` — document model, suitability and considerations
+
 ## Implementation
 
 The `swiftbank_nosql` database contains a `customers` collection. Customer documents include an embedded `accounts` array. The command script inserts and reads sample documents, updates sample email values, projects selected fields and queries customers with savings accounts.
@@ -20,9 +26,9 @@ The screenshots document the connection, database and customer documents, embedd
 
 ## Files and evidence
 
-- `swiftbank-nosql-commands.js` — database, document and query commands.
+- `mongodb/01-swiftbank-documents.js` — database, document and query commands.
 - `nosql-design-notes.txt` — document model, suitability and considerations.
-- Numbered screenshots — connection, documents, embedded accounts, query and verification.
+- `evidence/01-mongodb-connection.png` through `evidence/07b-final-customer-verification.png` — connection, documents, embedded accounts, query and verification.
 
 ## Limitations
 

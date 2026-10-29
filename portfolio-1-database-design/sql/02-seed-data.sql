@@ -2,7 +2,7 @@
 -- Project: SwiftBank Banking Database
 -- Portfolio 1: Repeatable sample data for the documented schema
 --
--- Run CREATE TABLE COMMANDS.sql first. This script only inserts the
+-- Run sql/01-create-tables.sql first. This script only inserts the
 -- fictional SwiftBank sample records; it does not delete or reset data.
 -- Re-running it is safe because existing rows are matched by the schema's
 -- unique email and account_number values.
