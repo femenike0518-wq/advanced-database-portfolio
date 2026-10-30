@@ -46,7 +46,7 @@ Capture the revised implementation in these new screenshots:
 - `evidence/12-email-index-execution-stats.png` — the email lookup plan and execution statistics.
 - `evidence/13-invalid-document-rejected.png` — actual validation error for the invalid account type.
 
-Only screenshots captured from the user's local MongoDB Compass run count as evidence. This collection has three documents, so its explain output demonstrates the selected index but cannot establish a meaningful performance improvement.
+The revised screenshots were captured from the user's local MongoDB Community Server 9.0.4 using standalone mongosh. They document these local results only. This collection has three documents, so its explain output demonstrates the selected index but cannot establish a meaningful performance improvement.
 
 ## Suitability and limitations
 
