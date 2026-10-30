@@ -1,35 +1,23 @@
 SwiftBank Database Design Notes
 
-1. Introduction
+1. Case study
+SwiftBank is a fictional banking system for the MIT 8103 Advanced Database Systems practical. Customers hold savings or current accounts and use them for deposits, withdrawals and transfers. Bank staff and administrators maintain customer/account records and review transaction history. The database stores customer contact details, account identifiers and balances, and transactions with type, amount, status, date and account references.
 
-SwiftBank is a fictional banking system designed for the MIT 8103 Advanced Database Systems practical portfolio. The database stores customer information, bank account details, and transaction records.
+2. Relational schema
+- customers: customer_id is the primary key. full_name, email, phone and created_at describe a customer. email is unique and required.
+- accounts: account_id is the primary key; customer_id is a foreign key to customers.customer_id. account_number is unique and required. account_type is limited to savings/current. balance cannot be negative.
+- transactions: transaction_id is the primary key. source_account_id and destination_account_id are nullable foreign keys to accounts.account_id. transaction_type, amount, status and transaction_date describe the event. The amount must be positive and status must be pending, completed or failed.
 
-2. Database Tables
+3. Relationships and transaction constraints
+A customer may own multiple accounts, while each account belongs to one customer. Transactions reference accounts in source and destination roles. A deposit requires a destination and has a NULL source. A withdrawal requires a source and has a NULL destination. A transfer requires both account references and they must be different. These conditions are enforced by chk_transaction_accounts, in addition to the foreign keys.
 
-The database contains three main tables:
+4. Seed data and balances
+The seed script includes six fictional customers, six accounts, opening-balance deposits, and examples of completed deposits, withdrawals and transfers plus one failed withdrawal. The opening deposits equal the starting account balances. The completed later activity is balanced to net to zero, so stored balances remain equal to total completed deposits/credits minus completed withdrawals/debits. The failed attempt does not move money. The original three customer/account records are retained to match the MongoDB portfolio.
 
-Customers: Stores customer details, including customer ID, full name, email address, phone number, and date of registration.
+5. Keys, constraints and normalisation
+Primary keys identify rows; foreign keys preserve relationships; unique email and account number constraints prevent duplicates. CHECK constraints restrict account type, nonnegative balances, positive amounts, allowed status/type values and valid source/destination combinations.
 
-Accounts: Stores account information, including account ID, customer ID, account number, account type, balance, and creation date.
+The schema follows 1NF by storing atomic values and using rows rather than repeating account columns. Each table has a single-column primary key and its non-key fields describe that row (2NF for this design). Customer, account and transaction facts are separated into their own tables and linked by foreign keys rather than repeated (3NF design rationale). A formal normal-form proof would require enumerating all functional dependencies and candidate keys.
 
-Transactions: Records deposits, withdrawals, and transfers, including the transaction amount, status, date, and related accounts.
-
-3. Relationships
-
-The Customers and Accounts tables are connected through customer_id. This means a customer can have multiple accounts, while each account belongs to one customer.
-
-The Transactions table references the Accounts table through source_account_id and destination_account_id. These fields identify the accounts involved in withdrawals, deposits, and transfers.
-
-4. Keys and Constraints
-
-Primary keys uniquely identify records in each table. Foreign keys connect related records and help maintain referential integrity.
-
-The database also uses constraints to prevent duplicate email addresses and account numbers, restrict account types to savings or current, require positive transaction amounts, and prevent negative account balances.
-
-5. Normalisation
-
-The design separates customer information, account information, and transaction records into different tables. This reduces unnecessary duplication and makes the data easier to maintain. Customer details do not need to be repeated for every account, and account details are stored separately from transaction records.
-
-6. Conclusion
-
-The SwiftBank database provides a structured foundation for managing customers, accounts, and transactions. Its relationships, keys, and constraints demonstrate important relational database design principles.
+6. Final ER diagram
+The final diagram is evidence/er-diagram-final.png. It shows the customers-to-accounts relationship and the two optional account references from transactions. The transaction-type rules also appear in the database CHECK constraint and are described above.
