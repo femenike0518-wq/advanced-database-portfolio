@@ -48,7 +48,7 @@ The SQL was run against the SwiftBank sample database. The table and query scree
 - `sql/01-create-tables.sql` — table definitions, keys and constraints.
 - `sql/02-seed-data.sql` — repeatable fictional customer and account records.
 - `sql/03-join-query.sql` — customer–account join used in the screenshots.
-- `join-query-results.xlsx..csv` — saved join output (this filename is still waiting to be renamed to `evidence/join-query-results.csv` because Excel currently has the file open).
+- `evidence/join-query-results.csv` — saved join output from the customer-account query.
 - `evidence/er-diagram-final.png` — final ER diagram.
 - `evidence/01-customer-account-results.png`, `evidence/02-database-tables.png`, `evidence/03a-create-customers-accounts.png`, `evidence/03b-create-transactions.png` — table creation and query screenshots.
 - `database-design-notes.txt` — case study, relationships and design notes.
