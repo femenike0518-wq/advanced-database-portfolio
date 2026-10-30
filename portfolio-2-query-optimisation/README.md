@@ -42,40 +42,38 @@ The scripts compare each query before and after creating targeted indexes. They 
 
 The earlier three-account experiment recorded about 0.108 ms before and 0.133 ms after adding `idx_accounts_balance`. PostgreSQL used sequential scans in the recorded plans. The table is too small for that one pair of timings to establish a general performance effect. The repeatable small-table script resets only its exercise index so it can be run again.
 
-## Evidence to capture after running the benchmark
+## Benchmark evidence
 
-Save full pgAdmin plan output under `evidence/` using these names:
+I captured the following outputs from my PostgreSQL 18.6 instance. Long plans use a `-b.png` continuation; read the paired images together to see the full plan and Execution Time.
 
-- `baseline-01-customer-account-join.png`
-- `baseline-02-account-type-aggregate.png`
-- `baseline-03-account-transaction-history.png`
-- `benchmark-data-counts.png`
-- `baseline-04-date-range-report.png`
-- `indexed-01-customer-account-join.png`
-- `indexed-02-account-type-aggregate.png`
-- `indexed-03-account-transaction-history.png`
-- `indexed-04-date-range-report.png`
-- `benchmark-result-parity.png`
-- `benchmark-median-summary.png`
-- `benchmark-index-sizes.png`
+The earlier three-account exercise is shown in [its baseline plan](evidence/01-baseline-execution-plan.png), [post-index plan](evidence/02-indexed-execution-plan.png), [balance filter plan](evidence/03-balance-filter-plan.png), [account index list](evidence/04-accounts-index-list.png) and [balance summary](evidence/05-account-balance-summary.png).
 
-Capture the complete query plan, including its node types, shared buffer counts and Execution Time. Do not crop off the plan summary. The plan screenshots still need to be captured from pgAdmin and committed. The measurements below came from a disposable PostgreSQL 18.6 validation cluster on my Windows machine because the usual server was not running during the audit. I will rerun the scripts on the PostgreSQL instance used for my portfolio, capture its outputs, and update these figures if its planner choices or medians differ.
-
-
+- Data counts: [benchmark-data-counts.png](evidence/benchmark-data-counts.png)
+- Baseline customer-account join: [first part](evidence/baseline-01-customer-account-join.png)
+- Baseline account-type aggregate: [baseline-02-account-type-aggregate.png](evidence/baseline-02-account-type-aggregate.png)
+- Baseline account transaction history: [first part](evidence/baseline-03-account-transaction-history.png), [continuation](evidence/baseline-03-account-transaction-history-b.png)
+- Baseline date-range report: [first part](evidence/baseline-04-date-range-report.png), [continuation](evidence/baseline-04-date-range-report-b.png)
+- Indexed customer-account join: [first part](evidence/indexed-01-customer-account-join.png), [continuation](evidence/indexed-01-customer-account-join-b.png)
+- Indexed account-type aggregate: [indexed-02-account-type-aggregate.png](evidence/indexed-02-account-type-aggregate.png)
+- Indexed account transaction history: [first part](evidence/indexed-03-account-transaction-history.png), [continuation](evidence/indexed-03-account-transaction-history-b.png)
+- Indexed date-range report: [indexed-04-date-range-report.png](evidence/indexed-04-date-range-report.png)
+- Result parity: [benchmark-result-parity.png](evidence/benchmark-result-parity.png)
+- Seven-run median comparison: [benchmark-median-summary.png](evidence/benchmark-median-summary.png)
+- Index sizes: [benchmark-index-sizes.png](evidence/benchmark-index-sizes.png)
 ## Local benchmark results
 
-I verified the scripts in a disposable PostgreSQL 18.6 cluster on this Windows machine. It contained 50,000 customers, 100,000 accounts and 500,000 transactions. The table below reports medians from seven measured runs after one warm-up for each query and stage. These are genuine local validation results, but they are provisional until I capture the corresponding plans from my regular pgAdmin connection.
+I ran the benchmark on my PostgreSQL 18.6 instance. It contained 50,000 customers, 100,000 accounts and 500,000 transactions. The table below reports medians from seven measured runs after one warm-up for each query and stage.
 
 | Query | Baseline median (ms) | Indexed median (ms) | Shared buffer hits, baseline to indexed | Observed plan change |
 | --- | ---: | ---: | ---: | --- |
-| Customer-account lookup | 7.209 | 0.029 | 938 to 6 | Accounts sequential scan to `p2_accounts_customer_id_idx` index scan |
-| Account-type aggregate | 43.672 | 25.871 | 935 to 935 | Sequential scan in both plans; do not attribute the timing difference to the covering index |
-| Account transaction history | 145.813 | 0.060 | 10,728 to 12 | Parallel sequential scans to bitmap index and heap scans on source/destination history indexes |
-| One-week date report | 93.848 | 8.180 | 5,336 to 5,390 | Parallel sequential scan to bitmap index and heap scans |
+| Customer-account lookup | 11.878 | 0.045 | 938 to 6 | Accounts sequential scan to index scan using `p2_accounts_customer_id_idx` |
+| Account-type aggregate | 108.407 | 43.528 | 935 to 935 | Sequential scan in both plans; the timing difference is not attributed to the covering index |
+| Account transaction history | 126.342 | 0.043 | 10,728 to 8 | Parallel sequential scans to index-only scans using the source and destination history indexes |
+| One-week date report | 106.458 | 4.749 | 5,336 to 72 | Parallel sequential scan to index-only scan using `p2_transactions_date_report_idx` |
 
-All four baseline and indexed result signatures matched (2, 2, 6 and 6 result rows by query, respectively). Shared read blocks were zero in the measured runs, so these figures describe warm-cache behaviour on this local cluster. The date report touched slightly more shared blocks with the index; its timing should be interpreted with the measured plan and local context.
+All four baseline and indexed result signatures matched (6, 2, 2 and 6 result rows for account history, account-type aggregate, customer lookup and date report, respectively). Shared read blocks were zero in the measured runs, so these figures describe warm-cache behaviour. The account-type aggregate median was lower in the indexed stage, although the planner used a sequential scan in both stages; I cannot attribute that timing difference to the covering index. These local measurements should be interpreted with the plans and machine context.
 
-The five benchmark indexes occupied 1,992 kB, 3,816 kB, 24 MB, 24 MB and 28 MB, respectively. They add storage and create extra work on inserts and updates. The local timings are not production guarantees. I will use the actual pgAdmin outputs from my regular PostgreSQL instance for final screenshots and revise the recorded values if needed.
+The five benchmark indexes occupied 1,992 kB, 3,816 kB, 28 MB, 24 MB and 24 MB respectively, in alphabetical order by index name. They add storage and create extra work on inserts and updates. The local timings are not production guarantees.
 
 ## Limitations
 
