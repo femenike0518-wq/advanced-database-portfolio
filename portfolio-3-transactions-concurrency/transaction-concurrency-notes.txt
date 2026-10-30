@@ -1,12 +1,19 @@
 # SwiftBank Transaction and Concurrency Notes
 
-## Rollback
-A transaction was started using BEGIN, and the balance of account 1 was temporarily increased by 100. The ROLLBACK command cancelled the uncommitted change. The final balance returned to 50,000.00.
+## Earlier demonstration (historical)
 
-## Commit
-The COMMIT command was tested with an update statement on a customer record. The transaction completed successfully, and the customer record remained available.
+The original screenshots recorded an earlier `public`-schema run: account 1 was temporarily increased by 100.00 and rolled back to 50,000.00; Session B at READ COMMITTED did not see Session A's uncommitted value; and a customer email was changed and restored. These screenshots remain historical evidence only. The previous script is archived under `superseded/` because it writes to the shared sample tables.
 
-## Transaction Isolation
-PostgreSQL reported READ COMMITTED as the current transaction isolation level. During the two-session test, Session A made an uncommitted update to account 1, while Session B continued to see the original committed balance of 50,000.00.
+## Current isolated demonstration
 
-The test demonstrated that Session B could not see Session A's uncommitted change. After the test transaction was rolled back, the account balance remained at 50,000.00.
+The current scripts use only the dedicated `p3_demo` schema. The setup starts account 1 at 5,000.00, account 2 at 2,500.00 and account 3 at 100.00. The captured run proceeded sequentially: committed transfer, insufficient-funds attempt, READ COMMITTED visibility test, lost-update test, then guarded updates. Rerun the setup before repeating the full sequence.
+
+Expected results to verify in pgAdmin:
+
+- Committed transfer of 750.00: balances become 4,250.00 and 3,250.00, with one completed ledger row.
+- Insufficient-funds attempt to debit 750.00 from account 3: PostgreSQL rejects the resulting -650.00 balance; rollback leaves account 3 at 100.00, account 2 at 3,250.00, and no failed transfer row.
+- READ COMMITTED visibility: Session A sees its uncommitted 3,350.00; Session B sees 3,250.00; rollback leaves 3,250.00.
+- Unguarded stale read-then-write: both sessions read 4,250.00; final balance is 4,150.00 instead of the correct 4,000.00 after both withdrawals.
+- Guarded atomic updates: Session B waits for Session A, then both withdrawals apply and the final balance is 3,900.00.
+
+These outcomes were observed in my captured pgAdmin results. The screenshots are listed in the P3 README; these isolated examples are coursework demonstrations, not a production concurrency or load test.
