@@ -1,32 +1,21 @@
- Performance Comparison: Before and After Indexing
+Small-table experiment
 
-The baseline query was executed using EXPLAIN ANALYZE and recorded an execution time of 0.108 ms. After creating an index on the balance column of the accounts table, the same query recorded an execution time of 0.133 ms.
+The earlier three-account SwiftBank experiment recorded approximately 0.108 ms before and 0.133 ms after the balance index. PostgreSQL used sequential scans in the saved plans. The dataset is too small for this timing difference to establish a general effect of indexing. The repeatable script drops and recreates only the exercise index; it does not change sample rows.
 
-The second execution was slightly slower, and the execution plan did not demonstrate that the new balance index was used. This may be because the database contains only a small number of records, making a sequential scan efficient enough for PostgreSQL's planner.
+Larger synthetic benchmark validation
 
-The experiment shows that creating an index does not automatically improve query performance. The effect of an index depends on factors such as table size, data distribution, and query conditions.
+Environment: PostgreSQL 18.6, disposable local cluster initialized on the same Windows machine because the usual PostgreSQL server was stopped during the audit. The cluster was stopped and its temporary data folder removed after validation. The benchmark schema was isolated from all existing SwiftBank data.
 
+Rows loaded: 50,000 customers, 100,000 accounts and 500,000 transactions. Four queries were measured before and after creating indexes. Each median uses seven measured runs after one warm-up. All baseline/indexed row counts and hashes matched.
 
- Balance-Filter Query
+Query | Baseline median ms | Indexed median ms | Shared buffer hits, baseline to indexed | Plan observation
+Customer-account lookup | 7.209 | 0.029 | 938 to 6 | Accounts Seq Scan became an Index Scan using p2_accounts_customer_id_idx.
+Account-type aggregate | 43.672 | 25.871 | 935 to 935 | Sequential Scan remained in both plans; the timing difference is not attributed to the index.
+Account transaction history | 145.813 | 0.060 | 10,728 to 12 | Parallel Seq Scans became Bitmap Index Scans and Bitmap Heap Scans using source/destination history indexes.
+One-week date report | 93.848 | 8.180 | 5,336 to 5,390 | Parallel Seq Scan became a Bitmap Index Scan and Bitmap Heap Scan.
 
-I tested a query that retrieves accounts with balances greater than 40,000 without joining it to the customers table. The execution plan showed a sequential scan on the accounts table, returned two rows, and removed one row using the filter.
+Shared read blocks were zero in these measured runs, which were warm-cache measurements. The date-range query touched slightly more shared buffers after indexing even though its measured median was lower. These local results depend on this machine, data and query distribution and are not production guarantees.
 
-The recorded execution time was 0.142 ms. PostgreSQL did not use the newly created balance index for this query. Since the table contains only a small number of records, a sequential scan may be a reasonable choice.
+Index sizes after creation: p2_accounts_customer_id_idx 1,992 kB; p2_accounts_type_balance_idx 3,816 kB; p2_transactions_destination_history_idx 24 MB; p2_transactions_source_history_idx 24 MB; p2_transactions_date_report_idx 28 MB. These indexes use storage and add work to inserts and updates.
 
-This result supports the observation that query performance depends on the size of the dataset and the execution plan selected by the database.
-
-
- Index Verification
-
-I queried the PostgreSQL `pg_indexes` system view to verify the indexes on the accounts table. The results confirmed the presence of the primary-key index, the unique account-number index, and the newly created `idx_accounts_balance` index.
-
-Although the balance index exists, PostgreSQL used a sequential scan for the balance-filter query. The small number of records may make a sequential scan more efficient than using an index. This demonstrates that index creation alone does not guarantee improved query performance.
-
-
-Account Balance Summary
-
-I used an aggregate SQL query to group accounts by account type. The query used COUNT() to count the accounts, SUM() to calculate total balances, and AVG() to calculate average balances.
-
-The results showed one current account with a total balance of 80,000 and an average balance of 80,000. There were two savings accounts with a combined balance of 80,000 and an average balance of 40,000.
-
-This query demonstrates how SQL aggregate functions and GROUP BY can summarise account data for reporting and analysis.
+The direct plan screenshots still need to be captured in pgAdmin from the regular SwiftBank PostgreSQL instance. If its plan nodes or medians differ from this disposable validation run, I will use the regular-instance output for the final portfolio analysis.
