@@ -1,36 +1,30 @@
 # SwiftBank NoSQL Design Notes
 
-## Database and Collection
+## Document structure
 
-I created a MongoDB database named `swiftbank_nosql` and a collection named `customers` using MongoDB Compass.
+I use one `customers` collection in the `swiftbank_nosql` database. Each document contains one customer and an embedded `accounts` array. This structure is convenient when an application view needs one customer's account details at the same time.
 
-## Document Model
+The customer names, emails, account numbers, account types and balances match the repeatable seed in Portfolio 1. The balance values are stored as BSON `Decimal128`. MongoDB describes Decimal128 as decimal-based and intended for monetary, tax and scientific data; this avoids the approximate binary representation used by `double` for many decimal fractions. PostgreSQL remains authoritative for account balances.
 
-The customer documents contain the customer ID, full name, email address, and an embedded `accounts` array. The array stores account information, including the account number, account type, and balance.
+## Validation and indexes
 
-## Why I Used MongoDB
+The `customers` collection has a JSON Schema validator. It requires the customer ID, name, email, accounts and recent-transactions fields; account types are limited to `savings` and `current`; and balances must be Decimal128 values. Two unique indexes prevent duplicate `customer_id` and `email` values. The negative test attempts an unsupported account type and should be rejected by the validator.
 
-MongoDB stores data as documents. Embedding account details inside a customer document allows related information to be retrieved together without performing a relational JOIN for this example.
+The `recent_transactions` array is bounded to five items. It is empty because Portfolio 1's repeatable seed contains no transaction rows, so I do not fabricate MongoDB-only history. If a banking application needs a full transaction history, referencing a separate transaction collection avoids unbounded customer documents and supports querying transactions independently.
 
-## Comparison with PostgreSQL
+## Query and explain observations
 
-In my PostgreSQL design, customers and accounts are stored in separate tables connected through a foreign key. In MongoDB, the example stores the customer's account details inside the customer document.
+I use an embedded-account query to find customers with savings accounts and an aggregation to count accounts and total balances by account type. The email lookup is covered by a unique index, and `explain("executionStats")` shows the selected plan and execution statistics. The collection has only three documents, so the plan demonstrates index use but does not prove a useful real-world speedup.
 
-## Testing
+## Suitability and limitations
 
-I inserted three fictional SwiftBank customers: Tosin Amir, Daniel Musa, and Grace Bello. I used `db.customers.find()` to retrieve the documents and verify the stored records.
+Embedding account details is convenient for reading a customer's account overview. It also duplicates balances from the relational database, which can become stale if updates are not synchronized. The PostgreSQL tables remain the source of truth for money movement because a transfer requires the debit, credit and ledger write to succeed atomically; this MongoDB exercise does not implement that workflow.
 
-## Limitation
+I did not use a key-value database because the portfolio focuses on a structured customer document rather than direct key access or caching. A wide-column database is more suitable for large distributed write and analytical workloads, while a graph database is useful when traversing relationships is central. Those needs are outside this small SwiftBank demonstration.
 
-This is a small demonstration dataset. A real banking system would need careful decisions about data consistency, account updates, security, and transaction processing before choosing an appropriate data model.
+## References
 
-
-## NoSQL Query Test
-
-I queried the `customers` collection to find customers whose embedded account type is `savings`. The query returned Tosin Amir and Grace Bello. Daniel Musa was not returned because his account type is `current`.
-
-## Suitability of the Model
-
-The document model is useful when customer information and related account details need to be retrieved together. Embedding the account information reduces the need for a JOIN for this example.
-
-However, a real banking system must carefully consider data consistency, concurrent updates, security, and transaction requirements. The model used here is a small coursework demonstration, not a complete banking implementation.
+- MongoDB Manual, JSON Schema validation: https://www.mongodb.com/docs/manual/reference/operator/query/jsonschema/
+- MongoDB Shell, BSON data types and Decimal128: https://www.mongodb.com/docs/mongodb-shell/reference/data-types/
+- MongoDB Manual, unique indexes: https://www.mongodb.com/docs/manual/core/index-unique/
+- MongoDB Manual, explain command: https://www.mongodb.com/docs/manual/reference/command/explain/
