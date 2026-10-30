@@ -4,18 +4,18 @@ The earlier three-account SwiftBank experiment recorded approximately 0.108 ms b
 
 Larger synthetic benchmark validation
 
-Environment: PostgreSQL 18.6, disposable local cluster initialized on the same Windows machine because the usual PostgreSQL server was stopped during the audit. The cluster was stopped and its temporary data folder removed after validation. The benchmark schema was isolated from all existing SwiftBank data.
+Environment: PostgreSQL 18.6, pgAdmin 4 on my Windows machine. The benchmark schema was isolated from the SwiftBank sample tables.
 
 Rows loaded: 50,000 customers, 100,000 accounts and 500,000 transactions. Four queries were measured before and after creating indexes. Each median uses seven measured runs after one warm-up. All baseline/indexed row counts and hashes matched.
 
 Query | Baseline median ms | Indexed median ms | Shared buffer hits, baseline to indexed | Plan observation
-Customer-account lookup | 7.209 | 0.029 | 938 to 6 | Accounts Seq Scan became an Index Scan using p2_accounts_customer_id_idx.
-Account-type aggregate | 43.672 | 25.871 | 935 to 935 | Sequential Scan remained in both plans; the timing difference is not attributed to the index.
-Account transaction history | 145.813 | 0.060 | 10,728 to 12 | Parallel Seq Scans became Bitmap Index Scans and Bitmap Heap Scans using source/destination history indexes.
-One-week date report | 93.848 | 8.180 | 5,336 to 5,390 | Parallel Seq Scan became a Bitmap Index Scan and Bitmap Heap Scan.
+Customer-account lookup | 11.878 | 0.045 | 938 to 6 | Accounts Seq Scan became an Index Scan using p2_accounts_customer_id_idx.
+Account-type aggregate | 108.407 | 43.528 | 935 to 935 | Sequential Scan remained in both plans; the timing difference is not attributed to the index.
+Account transaction history | 126.342 | 0.043 | 10,728 to 8 | Parallel Seq Scans became Index Only Scans using source/destination history indexes.
+One-week date report | 106.458 | 4.749 | 5,336 to 72 | Parallel Seq Scan became an Index Only Scan using p2_transactions_date_report_idx.
 
 Shared read blocks were zero in these measured runs, which were warm-cache measurements. The date-range query touched slightly more shared buffers after indexing even though its measured median was lower. These local results depend on this machine, data and query distribution and are not production guarantees.
 
 Index sizes after creation: p2_accounts_customer_id_idx 1,992 kB; p2_accounts_type_balance_idx 3,816 kB; p2_transactions_destination_history_idx 24 MB; p2_transactions_source_history_idx 24 MB; p2_transactions_date_report_idx 28 MB. These indexes use storage and add work to inserts and updates.
 
-The direct plan screenshots still need to be captured in pgAdmin from the regular SwiftBank PostgreSQL instance. If its plan nodes or medians differ from this disposable validation run, I will use the regular-instance output for the final portfolio analysis.
+The complete pgAdmin plan evidence is saved in evidence/. The baseline history, baseline date-range, indexed customer lookup and indexed history plans use paired screenshots with a -b continuation. The account-type aggregate median was lower in the indexed stage, although its plan remained a sequential scan in both stages; the timing difference is not attributed to the index. Shared read blocks were zero; these are warm-cache results from one local machine, not production guarantees.
