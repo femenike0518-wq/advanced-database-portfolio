@@ -2,7 +2,7 @@
 
 ## SwiftBank case study
 
-SwiftBank is a fictional banking system used throughout this individual practical portfolio. It stores customer, account and transaction records. The activities use PostgreSQL for relational design, query analysis and transaction work, MongoDB for a document model, and PostgreSQL replication settings and architecture discussion for the distributed database exercise.
+SwiftBank is a fictional banking system used throughout this individual practical portfolio. It stores customer, account and transaction records. The activities use PostgreSQL for relational design, query analysis, transactions and local replication; MongoDB for a document model.
 
 ## Portfolio guide
 
@@ -21,15 +21,15 @@ Each portfolio README identifies the work, its evidence and relevant limitations
 | Path | Contents |
 | --- | --- |
 | [portfolio-1-database-design/](portfolio-1-database-design/) | Relational schema, seed data, ER diagram. Scripts in `sql/`, screenshots and diagrams in `evidence/`. Final ER: `evidence/er-diagram-final.png`. |
-| [portfolio-2-query-optimisation/](portfolio-2-query-optimisation/) | Query plans and the small-table index experiment. Canonical SQL in `sql/`; earlier one-statement files in `sql/superseded/`; screenshots in `evidence/`. |
-| [portfolio-3-transactions-concurrency/](portfolio-3-transactions-concurrency/) | Commit, rollback and two-session isolation. Script in `sql/`, screenshots in `evidence/`. |
+| [portfolio-2-query-optimisation/](portfolio-2-query-optimisation/) | Query plans and benchmark experiment. Canonical SQL in `sql/`; earlier one-statement files in `sql/superseded/`; screenshots in `evidence/`. |
+| [portfolio-3-transactions-concurrency/](portfolio-3-transactions-concurrency/) | Commit, rollback and two-session isolation. Scripts in `sql/`, screenshots in `evidence/`. |
 | [portfolio-4-nosql/](portfolio-4-nosql/) | MongoDB document example. Commands in `mongodb/`, screenshots in `evidence/`. |
-| [portfolio-5-distributed-cloud/](portfolio-5-distributed-cloud/) | Replication-setting inspection and architecture discussion. Queries in `sql/`, screenshots in `evidence/`. |
+| [portfolio-5-distributed-cloud/](portfolio-5-distributed-cloud/) | PostgreSQL 18.6 local asynchronous streaming standby, verification scripts and distributed/cloud design notes. PowerShell setup instructions are in the P5 README; screenshots are in `evidence/`. |
 
 ## Tools
 
-- PostgreSQL 18.6 and pgAdmin for relational design, query plans, transaction tests and replication-setting review.
-- MongoDB Community Server and MongoDB Compass for the SwiftBank document example.
+- PostgreSQL 18.6 and pgAdmin for relational design, query plans, transaction tests and local replication.
+- MongoDB Community Server and `mongosh` for the SwiftBank document example.
 - Git and GitHub for version control and evidence storage.
 
 ## Submission checks
