@@ -1,24 +1,18 @@
 # SwiftBank Distributed and Cloud Database Notes
 
-## 1. Case Study
-SwiftBank is a fictional banking system that stores customer details, bank accounts, balances and transactions.
+## Case study
+SwiftBank is a fictional banking system that stores customers, accounts, balances and transactions. PostgreSQL is the authoritative system for relational data and money movement.
 
-## 2. Purpose of Distributed Databases
-A distributed database stores data across multiple connected database servers or locations. This can improve availability, support growth, and help a system continue operating when one server becomes unavailable.
+## Replication practical
+I inspected PostgreSQL 18.6 replication settings on the primary and recorded `wal_level = replica`, `max_wal_senders = 10` and `hot_standby = on`. I then created a separate local physical standby on port 5433 using `pg_basebackup`. The primary's `pg_stat_replication` showed one client in `streaming` state with `sync_state = async`. A marker written to an isolated demo table on the primary appeared on the standby. A write attempt on the standby was rejected with SQLSTATE `25006`. Removing an accidental extra marker on the primary was also reflected on the standby.
 
-## 3. Replication
-Replication maintains copies of data on multiple database servers. For SwiftBank, a replica could support read requests or help with recovery if the primary server fails. Replication must be configured carefully to avoid stale or conflicting account information.
+This confirms that local asynchronous streaming replication was active during the practical. It does not show failover, production availability, sustained lag behavior or a cloud deployment. I did not alter SwiftBank's customer, account or transaction tables as part of the replication check.
 
-## 4. Sharding
-Sharding divides a database into smaller parts across servers. SwiftBank could partition data by customer or account range as its data grows. The design must ensure that transactions involving multiple shards remain correct.
+## Sharding
+If SwiftBank grew beyond one server's capacity, customer or account identifiers could be considered as shard keys. A transfer between accounts on different shards would need coordinated debits and credits; partial completion could create incorrect balances. This makes cross-shard transaction handling a major design concern.
 
-## 5. Consistency and Availability
-Banking balances must remain accurate. SwiftBank should prioritise correct transaction processing and use appropriate consistency controls when handling deposits, withdrawals, and transfers. Replicas and failover arrangements can improve availability, but they must not allow conflicting balance updates.
+## Consistency and availability
+Banking balances require correct transaction processing. Asynchronous replicas can be stale while WAL changes are in transit, so reads that need the latest balance should use the primary or a consistency-aware design. Synchronous replication can improve commit durability across nodes but may add latency or reduce write availability when a standby is unavailable. Any failover must avoid two writable primaries and be tested before production use.
 
-## 6. Practical Work and Status
-The submitted practical work inspects the local PostgreSQL 18.6 SwiftBank database and reviews replication-related settings. The recorded values are `wal_level = replica`, `max_wal_senders = 10`, and `hot_standby = on`. The server reported `pg_is_in_recovery() = false`, and `pg_stat_replication` returned no connected standby rows.
-
-These checks and the architecture discussion are documented in this portfolio. They do not configure or demonstrate active replication. The primary-and-standby arrangement is a proposal; a separate standby, streaming connection and failover test remain future work.
-
-## 7. Conclusion
-A distributed database design could help SwiftBank scale and recover from server failures. Replication, partitioning, transaction coordination, security and recovery procedures would need to be designed and tested carefully before deployment.
+## Cloud considerations
+A managed cloud PostgreSQL service could provide backups, monitoring and managed replicas, but the service configuration, access controls, recovery objectives, data location and cost would need to be evaluated. No cloud service was configured in this practical.
