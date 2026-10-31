@@ -1,14 +1,12 @@
 # SwiftBank Distributed Database Architecture
 
 ## Proposed design
-The SwiftBank application connects to a primary PostgreSQL server. The primary processes account updates and banking transactions. A standby server receives replicated database changes and can support recovery if the primary fails.
+SwiftBank uses PostgreSQL as its authoritative relational database. Account updates and money movement are written to the primary. A standby can receive WAL changes and support read-only access or recovery planning, subject to replication lag and a tested failover process.
 
-## Current implementation status
-The practical checks confirmed that the local SwiftBank database runs on PostgreSQL 18.6. The server returned false for pg_is_in_recovery(), and pg_stat_replication returned no connected standby rows. Therefore, replication is not currently configured or active.
+## Practical implementation
+I configured a separate local PostgreSQL 18.6 physical standby using `pg_basebackup`. The existing server remained the primary on port 5432; the standby used a separate data directory and port 5433. The primary reported the standby as `streaming` with asynchronous replication. A marker written to an isolated `p5_replication_demo` table appeared on the standby, and PostgreSQL rejected a standby write with SQLSTATE `25006`. This verifies local streaming and read-only behavior. I did not promote the standby or test failover.
 
 ## Design considerations
-Replication must be configured and tested before claiming that a standby is available. SwiftBank must also consider replication lag, backup and recovery procedures, secure connections, and transaction consistency. A banking system must prevent incorrect or conflicting balance updates during failover.
+Asynchronous replication can leave recent changes unavailable on a standby during lag or a primary failure. SwiftBank should keep balance-changing transactions on the primary and monitor replication health before relying on replicas. Synchronous replication could reduce the risk of losing acknowledged commits, but it can increase latency and make writes depend on standby availability. Failover requires a tested process to prevent two writable primaries.
 
-## Replication Configuration Check
-
-I inspected the PostgreSQL replication-related settings. The results showed `wal_level = replica`, `max_wal_senders = 10`, and `hot_standby = on`. These settings support the configuration of PostgreSQL replication, but they do not confirm that a standby server is connected. My earlier check of `pg_stat_replication` returned no connected standby rows. Therefore, a working replica and failover have not yet been demonstrated.
+Sharding could distribute customers or accounts by a stable customer/account key as data grows. Transfers between shards would require coordination across both sides of the transfer, making atomic money movement more complex. I did not implement sharding or cloud deployment.
