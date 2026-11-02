@@ -22,14 +22,14 @@ To avoid changing SwiftBank's banking tables, I used `p5_replication_demo.replic
 
 1. I run `sql/01-inspect-replication.sql` in pgAdmin on the primary to review the version, tables and settings.
 2. I run `sql/02-create-replication-role.sql` on the primary. I set the role password locally in pgAdmin and keep it out of scripts and this repository. I confirm the primary's `pg_hba.conf` allows the replication connection from `127.0.0.1/32` and reload PostgreSQL if I change it.
-3. In PowerShell, use the installed PostgreSQL 18 tools to take a base backup. Enter the replication-role password at the prompt:
+3. In PowerShell, I use the installed PostgreSQL 18 tools to take a base backup. I enter the replication-role password at the prompt:
 
    ```powershell
    & "C:\Program Files\PostgreSQL\18\bin\pg_basebackup.exe" -h 127.0.0.1 -p 5432 -U swiftbank_repl -D "C:\Users\USER\Documents\swiftbank-standby" -Fp -Xs -P -R -W
    ```
 
    I keep the standby directory outside this repository. The generated standby connection configuration can contain the replication password, so I keep it out of Git and screenshots.
-4. Start the standby on port 5433:
+4. I start the standby on port 5433:
 
    ```powershell
    & "C:\Program Files\PostgreSQL\18\bin\pg_ctl.exe" -D "C:\Users\USER\Documents\swiftbank-standby" -o "-p 5433 -h 127.0.0.1 -c logging_collector=off" -l "C:\Users\USER\Documents\swiftbank-standby-startup.log" start
