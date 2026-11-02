@@ -40,14 +40,14 @@ Before I submit, I confirm that the evidence files open, the GitHub repository i
 
 ### Tools used
 
-I used ChatGPT and Codex while completing this portfolio.
+I used ChatGPT, Codex and Cursor Agent while completing this portfolio.
 
 ### What I used each tool for
 
-I used ChatGPT to understand the assignment and the tasks I needed to complete. I used Codex to help build my portfolios, correct mistakes, review my work, and draft my final documentation.
+I used ChatGPT to understand the assignment and the tasks I needed to complete. I used Codex to help build my portfolios, correct mistakes, review my work, and draft my final documentation. I used Cursor Agent to help organize portfolio files into SQL, MongoDB and evidence folders, and rename screenshot and script files so my README links remained accurate.
 
 ### How I reviewed and verified the work
 
-I ran every SQL and MongoDB script on my own PostgreSQL 18.6 and MongoDB instances, checked results against expected values, reviewed the negative tests, checked query result parity, and captured my own screenshots. I reviewed the AI-assisted work and take responsibility for the submitted portfolio and its explanations.
+I ran every SQL and MongoDB script on my own PostgreSQL 18.6 and MongoDB instances, checked results against expected values, reviewed the negative tests, checked query result parity, and captured my own screenshots. I checked the README links after the file organization and renaming work. I reviewed the AI-assisted work and take responsibility for the submitted portfolio and its explanations.
 
 Codex helped draft my final documentation. I reviewed that wording and am responsible for its accuracy.
