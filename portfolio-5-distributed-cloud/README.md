@@ -20,15 +20,15 @@ To avoid changing SwiftBank's banking tables, I used `p5_replication_demo.replic
 
 ## Run order
 
-1. Run `sql/01-inspect-replication.sql` in pgAdmin on the primary to review version, tables and settings.
-2. Run `sql/02-create-replication-role.sql` on the primary. Set the role password locally in pgAdmin; do not place it in a script or this repository. Confirm the primary's `pg_hba.conf` allows the replication connection from `127.0.0.1/32` and reload PostgreSQL if you change it.
+1. I run `sql/01-inspect-replication.sql` in pgAdmin on the primary to review the version, tables and settings.
+2. I run `sql/02-create-replication-role.sql` on the primary. I set the role password locally in pgAdmin and keep it out of scripts and this repository. I confirm the primary's `pg_hba.conf` allows the replication connection from `127.0.0.1/32` and reload PostgreSQL if I change it.
 3. In PowerShell, use the installed PostgreSQL 18 tools to take a base backup. Enter the replication-role password at the prompt:
 
    ```powershell
    & "C:\Program Files\PostgreSQL\18\bin\pg_basebackup.exe" -h 127.0.0.1 -p 5432 -U swiftbank_repl -D "C:\Users\USER\Documents\swiftbank-standby" -Fp -Xs -P -R -W
    ```
 
-   The standby directory is outside this repository. The generated standby connection configuration can contain the replication password; never copy it into Git or screenshots.
+   I keep the standby directory outside this repository. The generated standby connection configuration can contain the replication password, so I keep it out of Git and screenshots.
 4. Start the standby on port 5433:
 
    ```powershell
@@ -36,12 +36,12 @@ To avoid changing SwiftBank's banking tables, I used `p5_replication_demo.replic
    & "C:\Program Files\PostgreSQL\18\bin\pg_isready.exe" -h 127.0.0.1 -p 5433
    ```
 
-   `pg_isready` should report `accepting connections`. In pgAdmin, register a separate server named `SwiftBank Standby` with host `127.0.0.1`, port `5433`, database `swiftbank`, and your local PostgreSQL login.
-5. Run the query in `sql/01-inspect-replication.sql` for `pg_stat_replication` on the primary and confirm `streaming`.
-6. Run `sql/03-setup-replication-demo.sql` on the primary. Run `sql/04-verify-standby.sql` on the standby and confirm port `5433`, `is_standby = true`, and the replicated marker row.
-7. Run `sql/05-test-standby-write-rejection.sql` only on the standby. The expected result is a read-only transaction error with SQLSTATE `25006`.
+   `pg_isready` reports `accepting connections` in my setup. In pgAdmin, I register a separate server named `SwiftBank Standby` with host `127.0.0.1`, port `5433`, database `swiftbank`, and my local PostgreSQL login.
+5. I run the query in `sql/01-inspect-replication.sql` for `pg_stat_replication` on the primary and confirm `streaming`.
+6. I run `sql/03-setup-replication-demo.sql` on the primary. I run `sql/04-verify-standby.sql` on the standby and confirm port `5433`, `is_standby = true`, and the replicated marker row.
+7. I run `sql/05-test-standby-write-rejection.sql` on the standby. The expected result is a read-only transaction error with SQLSTATE `25006`.
 
-The scripts cover the SQL steps; PowerShell setup is a one-time local lab procedure. The backup command's `-R` writes connection information to the external standby directory, so that directory must remain private and untracked.
+The scripts cover my SQL steps; I use PowerShell setup as a one-time local lab procedure. The backup command's `-R` writes connection information to the external standby directory, so I keep that directory private and untracked.
 
 ## Evidence
 
