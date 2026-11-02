@@ -1,5 +1,7 @@
 # Portfolio 5: Distributed and Cloud Database Exercise
 
+> AI-use declaration: See the [root README](../README.md#ai-use-declaration).
+
 ## Case study and purpose
 
 I used the fictional SwiftBank banking system to inspect PostgreSQL replication settings and then set up a separate local physical standby. The primary remains my existing PostgreSQL 18.6 server on port 5432. The standby uses a separate data directory and port 5433; it does not replace or modify the primary data directory.

@@ -1,5 +1,7 @@
 # Portfolio 3: Transactions and Concurrency
 
+> AI-use declaration: See the [root README](../README.md#ai-use-declaration).
+
 ## Purpose
 
 I use a small SwiftBank test schema to demonstrate atomic funds transfers, rollback, transaction isolation, a lost update and a concurrency control. The demo data is fictional and isolated from the portfolio's `public` tables.
