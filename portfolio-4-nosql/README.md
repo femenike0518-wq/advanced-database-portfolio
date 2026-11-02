@@ -41,16 +41,16 @@ The validator requires the key customer and account fields, checks the allowed a
 
 The earlier screenshots `evidence/01-...` through `evidence/07b-...` document the original prototype, which used numeric balances and in-place email updates. They are retained as historical evidence and are not proof of the revised validator or Decimal128 model.
 
-I will recapture these screenshots to document the current implementation:
+I recaptured the updated evidence from my local MongoDB Community Server 9.0.4 using standalone mongosh:
 
-- `evidence/08-decimal128-customer-document.png` and `evidence/08-decimal128-customer-document-b.png` — customer documents and embedded Decimal128 balances across two screenshots.
-- `evidence/09-embedded-account-queries.png` and `evidence/09b-savings-account-query.png` — embedded account data and savings-account query results across two screenshots.
+- `evidence/08-decimal128-customer-document.png`, `evidence/08-decimal128-customer-document-b.png` and `evidence/08-decimal128-customer-document-c.png` — all three customer documents with their embedded Decimal128 balances and recent transactions.
+- `evidence/09-embedded-account-queries.png` and `evidence/09-embedded-account-queries-b.png` through `evidence/09-embedded-account-queries-d.png` — the embedded-account query output across four captures, including the recent transaction arrays. `evidence/09b-savings-account-query.png` retains the earlier savings-account query capture.
 - `evidence/10-account-type-aggregation.png` — counts and Decimal128 totals by account type.
-- `evidence/11-validator-and-unique-indexes.png` — the collection validator and both unique indexes.
+- `evidence/11-validator-and-unique-indexes.png` and `evidence/11-validator-and-unique-indexes-b.png` through `evidence/11-validator-and-unique-indexes-d.png` — both unique indexes and the full current collection validator, including the recent-transaction status and direction fields.
 - `evidence/12-email-index-execution-stats.png` — the email lookup plan and execution statistics.
 - `evidence/13-invalid-document-rejected.png` — actual validation error for the invalid account type.
 
-I captured the revised screenshots from my local MongoDB Community Server 9.0.4 using standalone mongosh. They document these local results only. This collection has three documents, so its explain output demonstrates the selected index but cannot establish a meaningful performance improvement.
+These captures document my local results only. This collection has three documents, so its explain output demonstrates the selected index but cannot establish a meaningful performance improvement.
 
 ## Suitability and limitations
 
