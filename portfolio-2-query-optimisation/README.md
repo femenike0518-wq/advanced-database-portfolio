@@ -1,5 +1,7 @@
 # Portfolio 2: Query Processing and Optimisation
 
+> AI-use declaration: See the [root README](../README.md#ai-use-declaration).
+
 ## Purpose
 
 I used PostgreSQL query plans to examine balance and transaction queries for the SwiftBank case study. I kept the original three-account result as a small-table example and added a larger, isolated synthetic benchmark so I could compare plans on more rows without changing the SwiftBank sample data.

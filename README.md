@@ -38,4 +38,16 @@ Before submitting, confirm that the evidence files open, the GitHub repository i
 
 ## AI-use declaration
 
-I used ChatGPT for learning, planning, troubleshooting, explanations and drafting. I reviewed and tested the portfolio work and am responsible for checking that the submitted evidence and explanations accurately describe what I completed.
+### Tools used
+
+I used ChatGPT and Codex while completing this portfolio.
+
+### What I used each tool for
+
+I used ChatGPT to understand the assignment and the tasks I needed to complete. I used Codex to help build my portfolios, correct mistakes, review my work, and draft my final documentation.
+
+### How I reviewed and verified the work
+
+I ran every SQL and MongoDB script on my own PostgreSQL 18.6 and MongoDB instances, checked results against expected values, reviewed the negative tests, checked query result parity, and captured my own screenshots. I reviewed the AI-assisted work and take responsibility for the submitted portfolio and its explanations.
+
+Codex helped draft my final documentation. I reviewed that wording and am responsible for its accuracy.

@@ -1,5 +1,7 @@
 # Portfolio 1: Database Design and Modelling
 
+> AI-use declaration: See the [root README](../README.md#ai-use-declaration).
+
 ## Case study
 
 SwiftBank is a fictional banking system. Customers use it to hold savings and current accounts and to make deposits, withdrawals and transfers. Bank staff and administrators maintain customer and account records and review transaction history. The database stores customer contact details, account identifiers and balances, and transaction type, amount, status, date and account references.

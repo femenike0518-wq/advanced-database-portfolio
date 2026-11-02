@@ -1,5 +1,7 @@
 # Portfolio 4: NoSQL and Advanced Data Models
 
+> AI-use declaration: See the [root README](../README.md#ai-use-declaration).
+
 ## Purpose and case study
 
 I model the same fictional SwiftBank customers and accounts used in Portfolio 1. The MongoDB `customers` collection embeds each customer's account details so they can be read together in one document.
