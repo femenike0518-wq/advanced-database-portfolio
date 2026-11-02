@@ -1,8 +1,8 @@
 # MIT 8103 Advanced Database Systems Portfolio
 
-## SwiftBank case study
+## Selected case study: SwiftBank
 
-SwiftBank is a fictional banking system used throughout this individual practical portfolio. It stores customer, account and transaction records. The activities use PostgreSQL for relational design, query analysis, transactions and local replication; MongoDB for a document model.
+SwiftBank is a fictional banking system for customers who hold savings and current accounts. Customers, bank staff and administrators use its database. It stores customer contact details, accounts and balances, and transaction types, amounts, statuses, dates and account references. The supported operations include opening and maintaining accounts, depositing, withdrawing, transferring funds, viewing transaction history, and reviewing transactions.
 
 ## Portfolio guide
 
