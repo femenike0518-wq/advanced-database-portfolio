@@ -47,12 +47,21 @@ The scripts cover my SQL steps; I use PowerShell setup as a one-time local lab p
 
 - `evidence/07-replication-configuration-settings.png` — primary replication settings.
 - `evidence/08-replication-role-created.png` — limited replication role attributes.
-- `evidence/09-pg-basebackup-complete.png` and `evidence/10-standby-started.png` — completed base backup and standby startup.
-- `evidence/10-primary-streaming-status.png` — `pg_stat_replication` showed the standby streaming asynchronously.
-- `evidence/11-primary-demo-write.png`, `evidence/12-standby-identity-check.png`, `evidence/12-standby-replicated-row.png` and `evidence/13-standby-replicated-rows.png` — primary marker write, standby identity and replicated rows (the two-row capture predates cleanup).
+- `evidence/09-pg-basebackup-complete.png`, `evidence/10a-standby-started.png` and `evidence/10b-primary-streaming-status.png` — completed base backup, standby startup and asynchronous streaming status, in setup order.
+- `evidence/11-primary-demo-write.png`, `evidence/12a-standby-identity-check.png`, `evidence/12b-standby-replicated-row.png` and `evidence/13-standby-replicated-rows.png` — primary marker write, standby identity and replicated rows (the two-row capture predates cleanup).
 - `evidence/14-standby-write-rejected.png` — standby rejected the write with SQLSTATE `25006`.
 - `evidence/15-standby-cleanup-verified.png` — primary cleanup was reflected on the standby.
 
 ## Limitations
 
-This is a single-machine, local asynchronous replication demonstration. It does not test network failure, sustained replication lag, automatic or manual failover, synchronous replication, backups, security hardening, or production availability. The standby can lag behind the primary, so it should not be treated as an authoritative source for current banking balances. The primary remains the authoritative database for writes. The earlier settings-only inspection is retained as evidence of the initial state before the standby was connected.
+I demonstrated local asynchronous replication on a single machine. I did not test network failure, sustained replication lag, automatic or manual failover, synchronous replication, backups, security hardening, or production availability. The standby can lag behind the primary, so I do not treat it as an authoritative source for current banking balances. The primary remains authoritative for writes. I retained the earlier settings-only inspection as evidence of the initial state before I connected the standby.
+
+## Distributed design discussion
+
+My implementation is a local asynchronous streaming standby. With asynchronous replication, the primary can acknowledge a balance update before its WAL reaches the standby; during that lag, a standby read may show an older balance. Synchronous replication waits for a standby acknowledgement, which can improve durability for acknowledged commits at the cost of latency and write availability when a required standby cannot respond. I would read current balances from the primary so customers and transfer logic do not act on stale replica values.
+
+If SwiftBank needed sharding, I could shard by `customer_id` so each customer's accounts are kept together. A transfer between customers assigned to different shards would need distributed transaction handling to coordinate both account updates and the ledger record atomically. A partial debit or credit would leave incorrect balances.
+
+For a bank, I would prioritize consistency for balance-changing operations, while planning availability and recovery explicitly. In CAP terms, a network partition forces a choice between serving writes on both sides and preserving a single consistent balance state; under PACELC, even without a partition, stronger coordination can add latency. A cloud deployment could use managed PostgreSQL with automated backups and managed replicas, or self-managed PostgreSQL on cloud virtual machines or containers. I would evaluate access controls, recovery objectives, data location, monitoring and cost before selecting a service. These sharding, consistency and cloud options are discussion only; I did not implement them. My implemented replication setup is the local asynchronous standby described above.
+
+For the fuller discussion, see my [distributed and cloud notes](distributed-cloud-notes.txt) and [distributed architecture notes](distributed-architecture-notes.txt).
