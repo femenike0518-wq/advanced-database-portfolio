@@ -34,7 +34,7 @@ Each portfolio README identifies the work, its evidence and relevant limitations
 
 ## Submission checks
 
-Before submitting, confirm that the evidence files open, the GitHub repository is accessible to the assessor, and the commit history shows the development work. The ZIP archive does not include Git history, so commit history must be checked in GitHub.
+Before I submit, I confirm that the evidence files open, the GitHub repository is accessible to the assessor, and the commit history shows the development work. The ZIP archive does not include Git history, so I check that history in GitHub.
 
 ## AI-use declaration
 
