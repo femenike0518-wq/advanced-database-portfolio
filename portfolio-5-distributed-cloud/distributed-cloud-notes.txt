@@ -12,7 +12,7 @@ This confirms that local asynchronous streaming replication was active during th
 If SwiftBank grew beyond one server's capacity, customer or account identifiers could be considered as shard keys. A transfer between accounts on different shards would need coordinated debits and credits; partial completion could create incorrect balances. This makes cross-shard transaction handling a major design concern.
 
 ## Consistency and availability
-Banking balances require correct transaction processing. Asynchronous replicas can be stale while WAL changes are in transit, so reads that need the latest balance should use the primary or a consistency-aware design. Synchronous replication can improve commit durability across nodes but may add latency or reduce write availability when a standby is unavailable. Any failover must avoid two writable primaries and be tested before production use.
+Banking balances require correct transaction processing. Asynchronous replicas can be stale while WAL changes are in transit, so I would direct reads that need the latest balance to the primary or use a consistency-aware design. Synchronous replication can improve commit durability across nodes but may add latency or reduce write availability when a standby is unavailable. I would require a tested failover process that avoids two writable primaries before production use.
 
 ## Cloud considerations
 A managed cloud PostgreSQL service could provide backups, monitoring and managed replicas, but the service configuration, access controls, recovery objectives, data location and cost would need to be evaluated. No cloud service was configured in this practical.
