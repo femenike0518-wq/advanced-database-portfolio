@@ -16,12 +16,12 @@ I used PostgreSQL query plans to examine balance and transaction queries for the
 
 I run the original small-table exercise in the SwiftBank database:
 
-1. `sql/01-small-table-experiment.sql` drops and recreates only `public.idx_accounts_balance`; it does not alter the sample rows. Run the script after Portfolio 1 has created `public.customers` and `public.accounts`.
+1. I run `sql/01-small-table-experiment.sql`, which drops and recreates only `public.idx_accounts_balance` without altering the sample rows, after Portfolio 1 has created `public.customers` and `public.accounts`.
 2. `sql/02-account-balance-summary.sql` reports the sample balances by account type.
 
 I run the larger benchmark in a database where my role can create schemas:
 
-3. `sql/03-build-benchmark-schema.sql` recreates only the `p2_benchmark` schema and loads deterministic fictional rows. **It drops any existing `p2_benchmark` schema**, so use that schema only for this exercise. It does not change `public` or other schemas.
+3. I run `sql/03-build-benchmark-schema.sql` to recreate only the `p2_benchmark` schema and load deterministic fictional rows. **It drops any existing `p2_benchmark` schema**, so I reserve that schema for this exercise. It does not change `public` or other schemas.
 4. `sql/04a-baseline-plans-and-measurements.sql` records baseline plans and measurements before the benchmark indexes exist.
 5. `sql/04b-indexed-plans-and-comparison.sql` creates the benchmark indexes, gathers statistics, records indexed plans and measurements, compares result signatures, and reports index sizes.
 
