@@ -31,7 +31,9 @@ I run the remaining files with the same executable and connection string, changi
 5. I run `mongodb/05-invalid-document-test.js` once to demonstrate that the validator rejects an unsupported account type. The expected validation error is intentional; this does not insert a document.
 ## Model and results
 
-The three inserted customers, canonical emails, account numbers, account types and balances match the repeatable P1 seed data. Account balances use BSON `Decimal128`, not JavaScript binary floating-point numbers. Each customer document also has a `recent_transactions` array with a validator limit of five items. The array is empty because P1 does not seed transaction rows; I do not invent transaction history for the MongoDB copy.
+The three inserted customers, canonical emails, account numbers, account types and balances match the repeatable P1 seed data. Account balances use BSON `Decimal128`, not JavaScript binary floating-point numbers. Each customer document also has a `recent_transactions` array with a validator limit of five items. I populated it from the P1 seed rows involving these three accounts. The array records the transaction type, Decimal128 amount, date, status, direction and, for transfers, the counterparty account number. I include the seeded failed withdrawal with `status: "failed"`; it records an unsuccessful attempt and does not change the balance.
+
+The two seeded transfers between SWB100002 and SWB100003 move 1,000.00 in each direction. Their net effect is zero, so the embedded final balances of 80,000.00 and 30,000.00 still match the final P1 balances. SWB100001 remains at 50,000.00.
 
 The validator requires the key customer and account fields, checks the allowed account types, and requires decimal balances. Unique indexes protect `customer_id` and `email`. The query scripts show the embedded account lookup, savings-account filter, account-type aggregate, and indexed email query plan.
 
@@ -52,7 +54,7 @@ I captured the revised screenshots from my local MongoDB Community Server 9.0.4 
 
 ## Suitability and limitations
 
-Embedding account details fits a customer view that commonly retrieves the customer and their accounts together. A bank's transaction ledger can grow without bound, so transaction history should normally be referenced from a separate transaction collection rather than continually expanding the customer document. The five-item array demonstrates a bounded recent-history option, but remains empty in this seed.
+Embedding account details fits a customer view that commonly retrieves the customer and their accounts together. A bank's transaction ledger can grow without bound, so I would normally reference full transaction history from a separate transaction collection rather than continually expanding the customer document. The five-item array demonstrates a bounded recent-history option, populated here with the matching P1 seed rows, including the failed withdrawal marked by status.
 
 The PostgreSQL database remains authoritative for balances and money movement. Copying balances into MongoDB creates a risk of stale or conflicting values unless a reliable synchronization design is added. Money transfers require atomic debit, credit and ledger writes, which this small customer-document example does not implement.
 
