@@ -8,9 +8,9 @@ The customer names, emails, account numbers, account types and balances match th
 
 ## Validation and indexes
 
-The `customers` collection has a JSON Schema validator. It requires the customer ID, name, email, accounts and recent-transactions fields; account types are limited to `savings` and `current`; and balances must be Decimal128 values. Two unique indexes prevent duplicate `customer_id` and `email` values. The negative test attempts an unsupported account type and should be rejected by the validator.
+The `customers` collection has a JSON Schema validator. It requires the customer ID, name, email, accounts and recent-transactions fields; account types are limited to `savings` and `current`; balances must be Decimal128 values; and recent transactions include a valid status and direction. Two unique indexes prevent duplicate `customer_id` and `email` values. My negative test attempts an unsupported account type, which the validator rejects.
 
-The `recent_transactions` array is bounded to five items. It is empty because Portfolio 1's repeatable seed contains no transaction rows, so I do not fabricate MongoDB-only history. If a banking application needs a full transaction history, referencing a separate transaction collection avoids unbounded customer documents and supports querying transactions independently.
+The `recent_transactions` array is bounded to five items and contains the P1 seed transactions for the three MongoDB accounts. I preserve the failed withdrawal with `status: "failed"`, so it is distinguishable from completed money movement. Transfers also record direction and the counterparty account number. If a banking application needs a full transaction history, referencing a separate transaction collection avoids unbounded customer documents and supports querying transactions independently.
 
 ## Query and explain observations
 
@@ -18,7 +18,7 @@ I use an embedded-account query to find customers with savings accounts and an a
 
 ## Suitability and limitations
 
-Embedding account details is convenient for reading a customer's account overview. It also duplicates balances from the relational database, which can become stale if updates are not synchronized. The PostgreSQL tables remain the source of truth for money movement because a transfer requires the debit, credit and ledger write to succeed atomically; this MongoDB exercise does not implement that workflow.
+Embedding account details is convenient for reading a customer's account overview. It also duplicates balances from the relational database, which can become stale if updates are not synchronized. The PostgreSQL tables remain the source of truth for money movement because a transfer requires the debit, credit and ledger write to succeed atomically; this MongoDB exercise does not implement that workflow. The 1,000.00 transfers between SWB100002 and SWB100003 net to zero, so the embedded balances remain 80,000.00 and 30,000.00, matching the final P1 balances; SWB100001 remains at 50,000.00.
 
 I did not use a key-value database because the portfolio focuses on a structured customer document rather than direct key access or caching. A wide-column database is more suitable for large distributed write and analytical workloads, while a graph database is useful when traversing relationships is central. Those needs are outside this small SwiftBank demonstration.
 
