@@ -1,8 +1,8 @@
 # MIT 8103 Advanced Database Systems Portfolio
 
-## SwiftBank case study
+## Selected case study: SwiftBank
 
-SwiftBank is a fictional banking system used throughout this individual practical portfolio. It stores customer, account and transaction records. The activities use PostgreSQL for relational design, query analysis, transactions and local replication; MongoDB for a document model.
+SwiftBank is a fictional banking system for customers who hold savings and current accounts. Customers, bank staff and administrators use its database. It stores customer contact details, accounts and balances, and transaction types, amounts, statuses, dates and account references. The supported operations include opening and maintaining accounts, depositing, withdrawing, transferring funds, viewing transaction history, and reviewing transactions.
 
 ## Portfolio guide
 
@@ -34,8 +34,20 @@ Each portfolio README identifies the work, its evidence and relevant limitations
 
 ## Submission checks
 
-Before submitting, confirm that the evidence files open, the GitHub repository is accessible to the assessor, and the commit history shows the development work. The ZIP archive does not include Git history, so commit history must be checked in GitHub.
+Before I submit, I confirm that the evidence files open, the GitHub repository is accessible to the assessor, and the commit history shows the development work. The ZIP archive does not include Git history, so I check that history in GitHub.
 
 ## AI-use declaration
 
-I used ChatGPT for learning, planning, troubleshooting, explanations and drafting. I reviewed and tested the portfolio work and am responsible for checking that the submitted evidence and explanations accurately describe what I completed.
+### Tools used
+
+I used ChatGPT and Codex while completing this portfolio.
+
+### What I used each tool for
+
+I used ChatGPT to understand the assignment and the tasks I needed to complete. I used Codex to help build my portfolios, correct mistakes, review my work, and draft my final documentation.
+
+### How I reviewed and verified the work
+
+I ran every SQL and MongoDB script on my own PostgreSQL 18.6 and MongoDB instances, checked results against expected values, reviewed the negative tests, checked query result parity, and captured my own screenshots. I reviewed the AI-assisted work and take responsibility for the submitted portfolio and its explanations.
+
+Codex helped draft my final documentation. I reviewed that wording and am responsible for its accuracy.

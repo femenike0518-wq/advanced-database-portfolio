@@ -1,5 +1,7 @@
 # Portfolio 1: Database Design and Modelling
 
+> AI-use declaration: See the [root README](../README.md#ai-use-declaration).
+
 ## Case study
 
 SwiftBank is a fictional banking system. Customers use it to hold savings and current accounts and to make deposits, withdrawals and transfers. Bank staff and administrators maintain customer and account records and review transaction history. The database stores customer contact details, account identifiers and balances, and transaction type, amount, status, date and account references.
@@ -26,11 +28,11 @@ The repeatable seed script creates six fictional customers, six accounts (saving
 
 ## Run order
 
-1. Connect pgAdmin to the SwiftBank database. If the three tables do not already exist, run `sql/01-create-tables.sql` once.
-2. Run `sql/02-seed-data.sql`. It inserts only missing sample rows and does not delete or reset existing data.
-3. Run `sql/03-join-query.sql` to view customer and account details.
-4. Run `sql/04-verify-seed-and-ledger.sql`. Each seeded account should show `balances_match = true`; the second query summarizes transaction types and statuses.
-5. Run `sql/05-negative-constraint-tests.sql`. Open the Messages tab to see each rejected invalid row and PostgreSQL's actual error text. The script ends with `ROLLBACK`, so the negative tests leave no rows behind. If any test prints `FAIL`, stop and report it; do not treat the constraints as verified.
+1. I connect pgAdmin to the SwiftBank database. If the three tables do not already exist, I run `sql/01-create-tables.sql` once.
+2. I run `sql/02-seed-data.sql`. It inserts only missing sample rows and does not delete or reset existing data.
+3. I run `sql/03-join-query.sql` to view customer and account details.
+4. I run `sql/04-verify-seed-and-ledger.sql`. Each seeded account shows `balances_match = true` in my verification; the second query summarizes transaction types and statuses.
+5. I run `sql/05-negative-constraint-tests.sql` and inspect PostgreSQL's actual error text in the Messages tab. The script ends with `ROLLBACK`, so the negative tests leave no rows behind. Every test printed `PASS` in my run; a `FAIL` line would mean that constraint did not behave as designed.
 
 ## Evidence
 

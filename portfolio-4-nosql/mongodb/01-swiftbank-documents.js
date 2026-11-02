@@ -32,11 +32,14 @@ swiftbank.createCollection("customers", {
           maxItems: 5,
           items: {
             bsonType: "object",
-            required: ["transaction_type", "amount", "occurred_at"],
+            required: ["transaction_type", "amount", "occurred_at", "status", "direction"],
             properties: {
               transaction_type: { bsonType: "string", enum: ["deposit", "withdrawal", "transfer"] },
               amount: { bsonType: "decimal", minimum: Decimal128("0.01") },
-              occurred_at: { bsonType: "date" }
+              occurred_at: { bsonType: "date" },
+              status: { bsonType: "string", enum: ["pending", "completed", "failed"] },
+              direction: { bsonType: "string", enum: ["in", "out"] },
+              counterparty_account_number: { bsonType: "string", minLength: 1 }
             }
           }
         }
@@ -58,7 +61,7 @@ swiftbank.customers.createIndex(
 
 // These three fictional records match Portfolio 1's repeatable seed data.
 // Decimal128 represents money without binary floating-point rounding.
-// No transaction rows were seeded in Portfolio 1, so the bounded arrays start empty.
+// The bounded arrays include every P1 seed transaction involving these accounts.
 swiftbank.customers.insertMany([
   {
     customer_id: NumberInt(1),
@@ -71,7 +74,15 @@ swiftbank.customers.insertMany([
         balance: Decimal128("50000.00")
       }
     ],
-    recent_transactions: []
+    recent_transactions: [
+      {
+        transaction_type: "deposit",
+        amount: Decimal128("50000.00"),
+        occurred_at: ISODate("2026-01-01T09:00:00Z"),
+        status: "completed",
+        direction: "in"
+      }
+    ]
   },
   {
     customer_id: NumberInt(2),
@@ -84,7 +95,38 @@ swiftbank.customers.insertMany([
         balance: Decimal128("80000.00")
       }
     ],
-    recent_transactions: []
+    recent_transactions: [
+      {
+        transaction_type: "withdrawal",
+        amount: Decimal128("1000000.00"),
+        occurred_at: ISODate("2026-02-05T12:00:00Z"),
+        status: "failed",
+        direction: "out"
+      },
+      {
+        transaction_type: "transfer",
+        amount: Decimal128("1000.00"),
+        occurred_at: ISODate("2026-02-04T11:00:00Z"),
+        status: "completed",
+        direction: "in",
+        counterparty_account_number: "SWB100003"
+      },
+      {
+        transaction_type: "transfer",
+        amount: Decimal128("1000.00"),
+        occurred_at: ISODate("2026-02-03T11:00:00Z"),
+        status: "completed",
+        direction: "out",
+        counterparty_account_number: "SWB100003"
+      },
+      {
+        transaction_type: "deposit",
+        amount: Decimal128("80000.00"),
+        occurred_at: ISODate("2026-01-01T09:05:00Z"),
+        status: "completed",
+        direction: "in"
+      }
+    ]
   },
   {
     customer_id: NumberInt(3),
@@ -97,7 +139,31 @@ swiftbank.customers.insertMany([
         balance: Decimal128("30000.00")
       }
     ],
-    recent_transactions: []
+    recent_transactions: [
+      {
+        transaction_type: "transfer",
+        amount: Decimal128("1000.00"),
+        occurred_at: ISODate("2026-02-04T11:00:00Z"),
+        status: "completed",
+        direction: "out",
+        counterparty_account_number: "SWB100002"
+      },
+      {
+        transaction_type: "transfer",
+        amount: Decimal128("1000.00"),
+        occurred_at: ISODate("2026-02-03T11:00:00Z"),
+        status: "completed",
+        direction: "in",
+        counterparty_account_number: "SWB100002"
+      },
+      {
+        transaction_type: "deposit",
+        amount: Decimal128("30000.00"),
+        occurred_at: ISODate("2026-01-01T09:10:00Z"),
+        status: "completed",
+        direction: "in"
+      }
+    ]
   }
 ]);
 
