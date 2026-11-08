@@ -2,34 +2,34 @@
 
 > AI-use declaration: See the [root README](../README.md#ai-use-declaration).
 
-## Purpose
+Purpose
 
-I use a small SwiftBank test schema to demonstrate atomic funds transfers, rollback, transaction isolation, a lost update and a concurrency control. The demo data is fictional and isolated from the portfolio's `public` tables.
+I demonstrated atomic funds transfers, rollback, transaction isolation, a lost update and concurrency control using a small SwiftBank test schema. The demo data is separate from the `public` tables in the portfolio and is fictitious.
 
-## Environment
+Environment
 
 - PostgreSQL 18.6 and pgAdmin 4
-- Two pgAdmin Query Tool sessions for the concurrency demonstrations
+- Two sessions of the pgAdmin Query Tool were used to demonstrate concurrency 
 - Dedicated schema: `p3_demo`
 
-## Safety and reset
+Safety and reset
 
-All current scripts qualify their objects with `p3_demo`. The setup script drops and recreates only that schema. It does not change `public` or the P1 sample data. I reserve `p3_demo` for this exercise.
+All existing scripts use `p3_demo` to qualify their objects. Only that schema is dropped and recreated by the setup script. Neither the P1 sample data nor `public` are altered. For this exercise, I set aside `p3_demo`.
 
-I run `sql/01-setup-demo-schema.sql` before a fresh run to restore the same starting state. I do not rerun it while a demonstration transaction is open; I first commit or roll back the open transactions. The setup creates three fictional customers and three accounts: account 1 starts at 5,000.00, account 2 at 2,500.00, and account 3 at 100.00 for the insufficient-funds example.
+To return to the same initial state, I execute `sql/01-setup-demo-schema.sql` prior to a new run. I commit or roll back the open transactions before rerunning it while a demonstration transaction is open. Three fictitious clients and three accounts are created by the setup: account 1 begins at 5,000.00, account 2 at 2,500.00, and account 3 at 100.00 for the example of insufficient funds.
 
-## Run order
+Run order
 
-1. I run `sql/01-setup-demo-schema.sql` to reset only `p3_demo` and show the starting accounts.
-2. I run `sql/02-committed-funds-transfer.sql` to transfer 750.00 from account 1 to account 2; the debit, credit and ledger row are committed together. I run the before and after result queries separately when capturing evidence.
-3. I run the debit statement in `sql/03-insufficient-funds-rollback.sql` by itself. The balance check rejects the attempted `-650.00` balance; I run `ROLLBACK` separately, then verify account 3 remains at 100.00, account 2 remains at 3,250.00, and the failed transfer has no ledger row.
-4. I follow the SESSION A and SESSION B blocks in `sql/04-read-committed-two-sessions.sql` in order after the committed transfer. Session A adds 100.00 to account 2 but leaves it uncommitted; Session B at READ COMMITTED sees the committed 3,250.00. I roll back A and verify the balance remains 3,250.00.
-5. I follow each marked block in `sql/05-lost-update-two-sessions.sql` in two sessions after the transfer. Both sessions read account 1 at 4,250.00. Session B commits a stale calculation of 4,100.00 after its 150.00 withdrawal; Session A then commits its stale calculation of 4,150.00 for its 100.00 withdrawal. The final 4,150.00 is a lost update; if both withdrawals were applied, the balance would be 4,000.00.
-6. I follow the blocks in `sql/06-guarded-concurrent-withdrawals.sql` in two sessions after the lost-update test. Starting at 4,150.00, Session A's guarded 100.00 withdrawal changes the balance to 4,050.00 and holds a row lock. Session B's guarded 150.00 withdrawal waits; after A commits, B applies to the new balance. The final balance is 3,900.00.
+1. To reset just `p3_demo` and display the initial accounts, I execute `sql/01-setup-demo-schema.sql`.
+2. To move 750.00 from account 1 to account 2, I execute `sql/02-committed-funds-transfer.sql`; the ledger row, debit and credit are all committed simultaneously. When gathering evidence, I run the queries for the before and after results independently.
+3. The debit statement in `sql/03-insufficient-funds-rollback.sql` is executed independently. The attempted `-650.00` balance is rejected by the balance check; I run `ROLLBACK` independently to confirm that account 3 stays at 100.00, account 2 stays at 3,250.00 and the failed transfer has no ledger row.
+4. After the committed transfer, I proceed in the order specified by the SESSION A and SESSION B blocks in `sql/04-read-committed-two-sessions.sql`. Session B at READ COMMITTED sees the committed 3,250.00; Session A adds 100.00 to account 2 but does not commit it. I confirm that the balance is still 3,250.00 by rolling back A.
+5. In two sessions following the transfer, I follow each highlighted block in `sql/05-lost-update-two-sessions.sql`. Account 1 was read at 4,250.00 in both sessions. After withdrawing 150.00, Session B commits a stale calculation of 4,100.00; for withdrawing $100.00, Session A commits a stale calculation of 4,150.00. The balance would be 4,000.00 if both withdrawals were applied; the final 4,150.00 is a lost update.
+6. After the lost-update test, I follow the blocks in `sql/06-guarded-concurrent-withdrawals.sql` in two sessions. The guarded 100.00 withdrawal made by Session A reduces the balance from 4,150.00 to 4,050.00 while maintaining a row lock. After A commits, B applies to the new balance, while Session B's guarded 150.00 withdrawal waits. 3,900.00 is the final balance.
 
-For files 03–06, I follow the comments in order; they include steps that require a visible constraint error, two separate Query Tool sessions, and pauses while a transaction remains open. I do not run an entire file in one Query Tool session.
+I follow the comments for files 03–06, which include steps that call for two distinct Query Tool sessions, pauses while a transaction is open, and a visible constraint error. I don't use a single Query Tool session to run a whole file.
 
-## Expected results
+Expected results
 
 | Demonstration | Expected result |
 | --- | --- |
@@ -39,9 +39,9 @@ For files 03–06, I follow the comments in order; they include steps that requi
 | Unguarded read-then-write | Final 4,150.00 instead of the expected 4,000.00, showing Session B's 150.00 withdrawal was overwritten |
 | Guarded atomic updates | Final 3,900.00 after both withdrawals are applied in sequence |
 
-## Evidence
+Evidence
 
-The following are actual pgAdmin screenshots saved under `evidence/`:
+These are real pgAdmin screenshots that were stored under `evidence/`:
 
 - [08-isolated-demo-accounts.png](evidence/08-isolated-demo-accounts.png)
 - [09-committed-transfer-balances.png](evidence/09-committed-transfer-balances.png) (account balances and transfer row)
@@ -61,12 +61,12 @@ The following are actual pgAdmin screenshots saved under `evidence/`:
 - [23-guarded-session-b-withdrawal.png](evidence/23-guarded-session-b-withdrawal.png)
 - [24-guarded-final-state.png](evidence/24-guarded-final-state.png)
 
-These screenshots show the actual PostgreSQL 18.6 results. Account 1 was 4,250.00 after the transfer; the intentionally unguarded concurrent update left it at 4,150.00 instead of 4,000.00; the guarded withdrawals then both applied and left it at 3,900.00. The commit message in the `20-...` screenshot is paired with the final-state value in `21-lost-update-final-state.png`.
+The actual PostgreSQL 18.6 results are displayed in these screenshots. Account 1 was 4,250.00 after the transfer; the intentionally unguarded concurrent update left it at 4,150.00 instead of 4,000.00; the guarded withdrawals then both applied and left it at 3,900.00. The final-state value in `21-lost-update-final-state.png` is matched with the commit message in the `20-...` screenshot.
 
-The screenshots document the actual pgAdmin output. For two-session demonstrations, the separate results show each session's read or update and the final balance.
+The actual pgAdmin output is captured in the screenshots. The separate results for two-session demonstrations display the final balance as well as the read or update from each session.
 
-## Earlier evidence and limitations
+Earlier evidence and restrictions
 
-The existing screenshots `01-rollback-demonstration.png` through `07-original-email-restored.png` document an earlier run against the shared `public` sample tables. I retain them as historical evidence only; I do not run the archived `superseded/public-schema-transactions-concurrency.sql` in the current workflow.
+An earlier run against the shared `public` sample tables is documented in the current screenshots `01-rollback-demonstration.png` through `07-original-email-restored.png`. The archived `superseded/public-schema-transactions-concurrency.sql` is not run in the current workflow; I only keep them as historical evidence.
 
-These are small local demonstrations, not a load test. The lost-update example intentionally uses a stale value to show the issue. The guarded `UPDATE ... WHERE balance >= amount` is the control demonstrated here; a production banking system would also need broader validation, authorization, auditing and operational controls beyond this coursework exercise.
+These are not load tests; rather, they are brief local demonstrations. To illustrate the problem, the lost-update example purposefully employs a stale value. The control shown here is the guarded `UPDATE ... WHERE balance >= amount`; beyond this coursework exercise, a production banking system would require more extensive validation, authorization, auditing and operational controls.
