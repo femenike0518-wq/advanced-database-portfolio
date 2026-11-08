@@ -1,54 +1,54 @@
-# Portfolio 2: Query Processing and Optimisation
+Portfolio 2: Query Processing and Optimisation
 
 > AI-use declaration: See the [root README](../README.md#ai-use-declaration).
 
-## Purpose
+Purpose
 
-I used PostgreSQL query plans to examine balance and transaction queries for the SwiftBank case study. I kept the original three-account result as a small-table example and added a larger, isolated synthetic benchmark so I could compare plans on more rows without changing the SwiftBank sample data.
+For the SwiftBank case study, I looked at balance and transaction queries using PostgresSQL query plans. In order to compare plans on more rows without altering the SwiftBank sample data, I added a larger isolated synthetic benchmark while maintaining the original three-account result as a small-table example.
 
-## Tools and environment
+Tools and environment
 
 - PostgreSQL 18.6 and pgAdmin 4
 - SQL `EXPLAIN (ANALYZE, BUFFERS)`
 - Synthetic benchmark schema: `p2_benchmark`
 
-## Run order
+Run order
 
-I run the original small-table exercise in the SwiftBank database:
+I execute the original small-table exercise in the SwiftBank database:
 
-1. I run `sql/01-small-table-experiment.sql`, which drops and recreates only `public.idx_accounts_balance` without altering the sample rows, after Portfolio 1 has created `public.customers` and `public.accounts`.
-2. `sql/02-account-balance-summary.sql` reports the sample balances by account type.
+1. After Portfolio 1 has created `public.customers` and `public.accounts`.  I run  `sql/01-small-table-experiment.sql`, which drops and recreates only `public.idx_accounts_balance` without changing the sample rows.
+2. The sample balances by account type are reported by `sql/02-account-balance-summary.sql`
 
-I run the larger benchmark in a database where my role can create schemas:
+In a database where my role has the ability to create schemas, I run the larger benchmark:
 
-3. I run `sql/03-build-benchmark-schema.sql` to recreate only the `p2_benchmark` schema and load deterministic fictional rows. **It drops any existing `p2_benchmark` schema**, so I reserve that schema for this exercise. It does not change `public` or other schemas.
-4. `sql/04a-baseline-plans-and-measurements.sql` records baseline plans and measurements before the benchmark indexes exist.
-5. `sql/04b-indexed-plans-and-comparison.sql` creates the benchmark indexes, gathers statistics, records indexed plans and measurements, compares result signatures, and reports index sizes.
+3. To recreate only the `p2_benchmark` schema and load deterministic fictional rows, I run  `sql/03-build-benchmark-schema.sql`. **It drops any existing `p2_benchmark` schema**, so I save that schema for this exercise. It doesn't alter other schemas or `public`
+4. Prior to the existence of benchmark indexes, baseline plans and measurements are recorded in `sql/04a-baseline-plans-and-measurements.sql`.
+5. The benchmark indexes are created, statistics are collected, indexed plans and measurements are recorded, result signatures are compared and index sizes are reported in `sql/04b-indexed-plans-and-comparison.sql`.
 
-In pgAdmin, I execute each `EXPLAIN` statement separately when capturing a plan screenshot so the complete plan, node names, buffers and Execution Time are visible. I execute the rest of each script to populate the median and result-parity outputs. A measurement consists of one warm-up followed by seven recorded runs; the reported median excludes the warm-up.
+When taking a plan screenshot in PgAdmin, I run each `EXPLAIN` statement independently so that the entire plan, node names, buffers and Execution Time are all visible. To fill in the median and result-parity outputs, I run the remainder of each script. One warm-up and seven recorded runs make up a measurement; the warm-up is not included in the reported median.
 
-## Benchmark data and queries
+Benchmark data and queries
 
-The isolated schema contains 50,000 fictional customers, 100,000 accounts and 500,000 transactions. Rows are generated deterministically with savings and current accounts, deposits, withdrawals and transfers, a small failed-status share, and transaction dates distributed across one year. These benchmark records are synthetic and are not a second copy of the portfolio's three sample customers.
+There are 500,000 transactions, 100,000 accounts and 50,000 fictitious customers in the isolated schema. Savings and current accounts, deposits, withdrawals and transfers, a tiny failed-status share and transaction dates spread out over a year are all generated deterministically. The three sample customers in the portfolio are not replicated in these synthetic benchmark records.
 
-The comparison covers:
+The comparison includes:
 
-- A selective customer-account join.
-- An aggregate of account balances by account type.
-- A recent activity lookup for one account, including transactions where it is the source or destination.
-- A one-week transaction-date report.
+- A selective join of customer accounts.
+- A total of account balances broken down by type of account.
+- A recent activity lookup for a single account that includes transactions in which it is either the source or the destination.
+- A report with a transaction date of one week.
 
-The scripts compare each query before and after creating targeted indexes. They store baseline and indexed result counts and hashes to check that the returned row sets match. I record the planner's actual scan choice; the scripts do not force PostgreSQL to use an index. A full-table aggregate may still use a sequential scan, which is useful evidence about when an index helps.
+Each query is compared by the scripts both before and after the targeted indexes are created. To ensure that the returned row sets match, they store hashes and baseline and indexed result counts. The scripts do not compel PostgreSQL to use an index; instead, I document the planner's actual scan selection. A sequential scan may still be used in a full-table aggregate, which is helpful information about when an index is helpful.
 
-## Small-table result
+Small-table result
 
-The earlier three-account experiment recorded about 0.108 ms before and 0.133 ms after adding `idx_accounts_balance`. PostgreSQL used sequential scans in the recorded plans. The table is too small for that one pair of timings to establish a general performance effect. The repeatable small-table script resets only its exercise index so it can be run again.
+Before and after adding `idx_accounts_balance`, the previous three-account experiment recorded roughly 0.108 and 0.133 milliseconds, respectively. Sequential scans were used by PostgreSQL in the recorded plans. That one pair of timings cannot establish a general performance effect because the table is too small. Only the exercise index is reset by the repeatable small-table script so that it can be executed once more.
 
-## Benchmark evidence
+Benchmark evidence
 
-I captured the following outputs from my PostgreSQL 18.6 instance. Long plans use a `-b.png` continuation; read the paired images together to see the full plan and Execution Time.
+From my PostgreSQL 18.6 instance, I obtained the following outputs. Long plans use a `-b.png` continuation; to view the entire plan and Execution Time, read the paired images together.
 
-The earlier three-account exercise is shown in [its baseline plan](evidence/01-baseline-execution-plan.png), [post-index plan](evidence/02-indexed-execution-plan.png), [balance filter plan](evidence/03-balance-filter-plan.png), [account index list](evidence/04-accounts-index-list.png) and [balance summary](evidence/05-account-balance-summary.png).
+[its baseline plan](evidence/01-baseline-execution-plan.png), [post-index plan](evidence/02-indexed-execution-plan.png), [balance filter plan](evidence/03-balance-filter-plan.png), [account index list](evidence/04-accounts-index-list.png) and [balance summary](evidence/05-account-balance-summary.png) all display the previous three-account exercise.
 
 - Data counts: [benchmark-data-counts.png](evidence/benchmark-data-counts.png)
 - Baseline customer-account join: [first part](evidence/baseline-01-customer-account-join.png)
@@ -62,9 +62,9 @@ The earlier three-account exercise is shown in [its baseline plan](evidence/01-b
 - Result parity: [benchmark-result-parity.png](evidence/benchmark-result-parity.png)
 - Seven-run median comparison: [benchmark-median-summary.png](evidence/benchmark-median-summary.png)
 - Index sizes: [benchmark-index-sizes.png](evidence/benchmark-index-sizes.png)
-## Local benchmark results
+Local benchmark results
 
-I ran the benchmark on my PostgreSQL 18.6 instance. It contained 50,000 customers, 100,000 accounts and 500,000 transactions. The table below reports medians from seven measured runs after one warm-up for each query and stage.
+I used my PostgreSQL 18.6 instance to run the benchmark. There were 500,000 transactions, 100,000 accounts, and 50,000 customers. For each query and stage, the table below shows the medians from seven measured runs following one warm-up.
 
 | Query | Baseline median (ms) | Indexed median (ms) | Shared buffer hits, baseline to indexed | Observed plan change |
 | --- | ---: | ---: | ---: | --- |
@@ -73,10 +73,10 @@ I ran the benchmark on my PostgreSQL 18.6 instance. It contained 50,000 customer
 | Account transaction history | 126.342 | 0.043 | 10,728 to 8 | Parallel sequential scans to index-only scans using the source and destination history indexes |
 | One-week date report | 106.458 | 4.749 | 5,336 to 72 | Parallel sequential scan to index-only scan using `p2_transactions_date_report_idx` |
 
-All four baseline and indexed result signatures matched (6, 2, 2 and 6 result rows for account history, account-type aggregate, customer lookup and date report, respectively). Shared read blocks were zero in the measured runs, so these figures describe warm-cache behaviour. The account-type aggregate median was lower in the indexed stage, although the planner used a sequential scan in both stages; I cannot attribute that timing difference to the covering index. These local measurements should be interpreted with the plans and machine context.
+Each of the four baseline and indexed result signatures (6, 2, 2, and 6 result rows for date report, account history, account-type aggregate and customer lookup, respectively) matched. These numbers illustrate warm-cache behavior because there were no shared read blocks during the measured runs. Though the planner employed a sequential scan in both stages, the account-type aggregate median was lower in the indexed stage; I am unable to link this timing discrepancy to the covering index. The plans and machine context should be taken into consideration when interpreting these local measurements.
 
-The five benchmark indexes occupied 1,992 kB, 3,816 kB, 28 MB, 24 MB and 24 MB respectively, in alphabetical order by index name. They add storage and create extra work on inserts and updates. The local timings are not production guarantees.
+In alphabetical order by index name, the five benchmark indexes took up 1,992 kB, 3,816 kB, 28 MB, 24 MB, and 24 MB, respectively. They increase storage and make updates and inserts more labor-intensive. Production is not guaranteed by the local timings.
 
-## Limitations
+Restrictions
 
-The benchmark is synthetic and runs on one local PostgreSQL instance. Warm-cache medians and planner choices describe this machine, this data distribution and these queries; they are not production-scale guarantees. Indexes consume storage and add work to inserts and updates. The small-table result remains useful because PostgreSQL can correctly prefer a sequential scan when a table is tiny.
+One local PostgreSQL instance is used to run the artificial benchmark. This machine, this data distribution, and these queries are described by warm-cache medians and planner choices; they are not production-scale guarantees. Inserts and updates are made more difficult by indexes, which also use storage. Because PostgreSQL can appropriately favor a sequential scan when a table is small, the small-table result is still helpful.
