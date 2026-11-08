@@ -1,10 +1,10 @@
-# Portfolio 1: Database Design and Modelling
+ Portfolio 1: Database Design and Modelling
 
 > AI-use declaration: See the [root README](../README.md#ai-use-declaration).
 
-## Case study
+ Case study
 
-SwiftBank is a fictional banking system. Customers use it to hold savings and current accounts and to make deposits, withdrawals and transfers. Bank staff and administrators maintain customer and account records and review transaction history. The database stores customer contact details, account identifiers and balances, and transaction type, amount, status, date and account references.
+SwiftBank: a fictional banking system. Customers use it to make deposits, make withdrawals, make transfers and store savings and current accounts. Bank employees and administrators can review transaction history and keep customer account records. Customer contact information, account identifiers and balances, transaction type, amount, status, date and account references are all stored in the database.
 
 ## Relational schema
 
