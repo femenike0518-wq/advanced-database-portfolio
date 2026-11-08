@@ -1,3 +1,3 @@
 # Superseded P3 script
 
-I retained `public-schema-transactions-concurrency.sql` as historical material. It updates rows in the shared `public` schema and assumes specific sample customer/account values. I do not use it for the current portfolio workflow; I use the numbered scripts in `../sql/`, which isolate all demonstrations in `p3_demo`.
+As historical material, I kept `public-schema-transactions-concurrency.sql`. It assumes certain sample customer/account values and modifies rows in the shared `public` schema. The numbered scripts in `../sql/`, which isolate every demonstration in `p3_demo`, are what I use instead of it for the current portfolio workflow.
