@@ -1,28 +1,27 @@
-# SwiftBank NoSQL Design Notes
+SwiftBank NoSQL Design Notes
 
-## Document structure
+Document structure
 
-I use one `customers` collection in the `swiftbank_nosql` database. Each document contains one customer and an embedded `accounts` array. This structure is convenient when an application view needs one customer's account details at the same time.
+In the `swiftbank_nosql` database, I utilize a single `customers` collection. One customer and an embedded `accounts` array are present in every document. When an application view requires one customer's account details simultaneously, this structure is handy.
 
-The customer names, emails, account numbers, account types and balances match the repeatable seed in Portfolio 1. The balance values are stored as BSON `Decimal128`. MongoDB describes Decimal128 as decimal-based and intended for monetary, tax and scientific data; this avoids the approximate binary representation used by `double` for many decimal fractions. PostgreSQL remains authoritative for account balances.
+The repeatable seed in Portfolio 1 is matched by the customer names, emails, account numbers, account types and balances. BSON `Decimal128` is used to store the balance values. Decimal128 avoids the approximate binary representation used by `double` for many decimal fractions, according to MongoDB and is designed for monetary, tax and scientific data. For account balances, PostgreSQL is still the standard.
+Validation and indexes
 
-## Validation and indexes
+There is a JSON Schema validator in the `customers` collection. Customer ID, name, email, accounts, and recent transactions are required; balances must be Decimal128 values; recent transactions must include a valid status and direction; and account types are restricted to savings and current. Duplicate `customer_id` and `email` values are prevented by two distinct indexes. The validator rejects my negative test's attempt to use an unsupported account type.
 
-The `customers` collection has a JSON Schema validator. It requires the customer ID, name, email, accounts and recent-transactions fields; account types are limited to `savings` and `current`; balances must be Decimal128 values; and recent transactions include a valid status and direction. Two unique indexes prevent duplicate `customer_id` and `email` values. My negative test attempts an unsupported account type, which the validator rejects.
+The P1 seed transactions for the three MongoDB accounts are contained in the five-item-limited `recent_transactions` array. In order to differentiate the unsuccessful withdrawal from the successful money transfer, I preserve it with `status: "failed"`. Additionally, transfers note the counterparty account number and direction. Referencing a different transaction collection prevents unbounded customer documents and allows for independent transaction querying if a banking application requires a complete transaction history.
 
-The `recent_transactions` array is bounded to five items and contains the P1 seed transactions for the three MongoDB accounts. I preserve the failed withdrawal with `status: "failed"`, so it is distinguishable from completed money movement. Transfers also record direction and the counterparty account number. If a banking application needs a full transaction history, referencing a separate transaction collection avoids unbounded customer documents and supports querying transactions independently.
+Query and explain observations
 
-## Query and explain observations
+I use an aggregation to count accounts and total balances by account type and an embedded-account query to identify clients with savings accounts. The chosen plan and execution statistics are displayed by `explain ("executionStats")); the email lookup is covered by a unique index. Since there are only three documents in the collection, the plan shows how to use an index but does not provide a practical speedup.
 
-I use an embedded-account query to find customers with savings accounts and an aggregation to count accounts and total balances by account type. The email lookup is covered by a unique index, and `explain("executionStats")` shows the selected plan and execution statistics. The collection has only three documents, so the plan demonstrates index use but does not prove a useful real-world speedup.
+Suitability and restrictions
 
-## Suitability and limitations
+It is easy to read a customer's account overview when account details are embedded. Additionally, it replicates balances from the relational database, which may become outdated if updates are not synchronized. Because a transfer needs the debit, credit and ledger write to be successful atomically, the PostgreSQL tables continue to be the source of truth for money movement; this MongoDB exercise does not implement that workflow. The embedded balances remain 80,000.00 and 30,000.00, matching the final P1 balances; SWB100001 stays at 50,000.00 because the 1,000.00 transfers between SWB100002 and SWB100003 net to zero.
 
-Embedding account details is convenient for reading a customer's account overview. It also duplicates balances from the relational database, which can become stale if updates are not synchronized. The PostgreSQL tables remain the source of truth for money movement because a transfer requires the debit, credit and ledger write to succeed atomically; this MongoDB exercise does not implement that workflow. The 1,000.00 transfers between SWB100002 and SWB100003 net to zero, so the embedded balances remain 80,000.00 and 30,000.00, matching the final P1 balances; SWB100001 remains at 50,000.00.
+Since the portfolio emphasizes structured customer documents over direct key access or caching, I did not use a key-value database. Large distributed write and analytical workloads are better suited for wide-column databases, while graph databases are helpful when relationship traversal is crucial. These requirements are not covered by this brief SwiftBank demonstration.
 
-I did not use a key-value database because the portfolio focuses on a structured customer document rather than direct key access or caching. A wide-column database is more suitable for large distributed write and analytical workloads, while a graph database is useful when traversing relationships is central. Those needs are outside this small SwiftBank demonstration.
-
-## References
+References
 
 - MongoDB Manual, JSON Schema validation: https://www.mongodb.com/docs/manual/reference/operator/query/jsonschema/
 - MongoDB Shell, BSON data types and Decimal128: https://www.mongodb.com/docs/mongodb-shell/reference/data-types/
