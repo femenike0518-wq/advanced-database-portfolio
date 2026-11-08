@@ -1,12 +1,12 @@
- Portfolio 1: Database Design and Modelling
+ Portfolio 1: Database Design and Modeling
 
 > AI-use declaration: See the [root README](../README.md#ai-use-declaration).
 
- Case study
+Case study
 
 SwiftBank: a fictional banking system. Customers use it to make deposits, make withdrawals, make transfers and store savings and current accounts. Bank employees and administrators can review transaction history and keep customer account records. Customer contact information, account identifiers and balances, transaction type, amount, status, date and account references are all stored in the database.
 
-## Relational schema
+Relational schema
 
 | Table | Primary key | Foreign keys | Main attributes and rules |
 | --- | --- | --- | --- |
@@ -14,33 +14,33 @@ SwiftBank: a fictional banking system. Customers use it to make deposits, make w
 | `accounts` | `account_id` | `customer_id` → `customers.customer_id` | Unique `account_number`, `account_type` limited to savings/current, nonnegative `balance`, `created_at`. |
 | `transactions` | `transaction_id` | Nullable `source_account_id` and `destination_account_id` → `accounts.account_id` | `transaction_type`, positive `amount`, `status`, `transaction_date`. A CHECK rule makes source/destination use depend on transaction type. |
 
-A customer can own multiple accounts; every account belongs to one customer. A transaction can reference accounts in the source and destination roles. A deposit has no source and requires a destination; a withdrawal requires a source and has no destination; a transfer requires two different accounts. Unique, NOT NULL, foreign key and CHECK constraints enforce these rules in PostgreSQL.
+Each account is owned by a single customer who may have more than one account. Accounts in the source and destination roles may be referenced in a transaction. A withdrawal needs a source and a destination; a transfer needs two separate accounts and a deposit has no source and a destination. In PostgresSQL, these rules are enforced by unique, NOT NULL, foreign key and CHECK constraints.
 
-## Final ER diagram and normalisation
+Final ER diagram and normalization
 
-The final diagram is `evidence/er-diagram-final.png`. It shows customers, accounts and transactions, the customer-to-account relationship, and the optional source and destination account references. Earlier drawings remain labelled as drafts or superseded in `evidence/`.
+ `evidence/er-diagram-final.png` is the final diagram. Customers, accounts and transactions are shown, along with the customer-to-account relationship and optional source and destination account references. Previous drawings are still marked as drafts or replaced in `evidence/`.
 
-The design applies 1NF by keeping each field atomic and representing multiple accounts as rows. Each table has a single-column primary key, so the listed non-key attributes depend on the whole key (2NF). Customer, account and transaction facts are kept in their respective tables and connected by foreign keys (3NF), avoiding repeated customer details in each account or transaction. These statements describe the submitted schema; a formal proof would require listing all functional dependencies and candidate keys.
+By keeping each field atomic and using rows to represent multiple accounts, the design employs 1NF. The listed non-key attributes rely on the entire key (2NF) because each table has a single-column primary key. In order to prevent duplicate information in each account or transaction, customer, account and transaction facts are stored in their corresponding tables and linked by foreign keys (3NF). These claims outline the submitted schema; a formal proof would need to include a list of all candidate keys and functional dependencies.
 
-## Seed data and balance reconciliation
+Seed data and Balance reconciliation
 
-The repeatable seed script creates six fictional customers, six accounts (savings and current), and eleven transactions. Each seeded account begins with an opening deposit matching its stored balance. The completed sample deposit/withdrawal and reciprocal transfer activity nets to zero, so the final balances remain equal to the completed ledger. The failed withdrawal records an attempted transaction and does not affect the balance. The sample retains the original three customers/accounts used by the MongoDB portfolio.
+Six fictitious clients, six accounts (current and savings) and eleven transactions are produced by the repeatable seed script. The opening deposit for each seeded account is equal to the stored balance. The final balances stay the same as the completed ledger because the completed sample deposit/withdrawal and reciprocal transfer activity nets to zero. The unsuccessful withdrawal does not impact the balance; instead, it documents an attempted transaction. The MongoDB portfolio's initial three accounts are kept in the sample.
 
-## Run order
+Run order
 
-1. I connect pgAdmin to the SwiftBank database. If the three tables do not already exist, I run `sql/01-create-tables.sql` once.
-2. I run `sql/02-seed-data.sql`. It inserts only missing sample rows and does not delete or reset existing data.
-3. I run `sql/03-join-query.sql` to view customer and account details.
-4. I run `sql/04-verify-seed-and-ledger.sql`. Each seeded account shows `balances_match = true` in my verification; the second query summarizes transaction types and statuses.
-5. I run `sql/05-negative-constraint-tests.sql` and inspect PostgreSQL's actual error text in the Messages tab. The script ends with `ROLLBACK`, so the negative tests leave no rows behind. Every test printed `PASS` in my run; a `FAIL` line would mean that constraint did not behave as designed.
+1. I link the SwiftBank database to pgAdmin. I run `sql/01-create-tables.sql` once if the three tables don't already exist.
+2. I execute `sql/02-seed-data.sql`. It does not remove or reset the current data; it only adds the missing sample rows.
+3. To view account and customer information, I execute `sql/03-join-query.sql`.
+4. I execute `sql/04-verify-seed-and-ledger.sql`. In my verification, every seeded account displays  `balances_match = true`; the second query provides an overview of transaction types and statuses.
+5. I examine PostgresSQL's actual error text in the Messages tab after running `sql/05-negative-constraint-tests.sql`. Because the script ends with `ROLLBACK`, the negative tests leave no rows behind. In my run, every test printed a `PASS`; a `FAIL` line would indicate that the constraint did not function as intended.
 
-## Evidence
+Evidence
 
-- `evidence/er-diagram-final.png` — selected ER diagram.
+- `evidence/er-diagram-final.png` — chosen ER diagram.
 - `evidence/01-customer-account-results.png`, `evidence/02-database-tables.png`, `evidence/03a-create-customers-accounts.png` and `evidence/03b-create-transactions.png` — existing design and table evidence.
 - New evidence captured after running the updated seed and verification scripts: `evidence/04-seed-and-ledger-check.png`, `evidence/05-negative-constraint-tests.png` and `evidence/06-transaction-type-status-summary.png`.
-- `database-design-notes.txt` — detailed design and normalisation notes.
+- `database-design-notes.txt` — comprehensive design and normalization notes.
 
-## Limitations
+Restrictions
 
-This is a small fictional coursework dataset. The SQL constraints validate row-level relationships and values; the examples do not implement a production banking service or a complete accounting ledger.
+This is a small made-up coursework dataset. Row-level relationships and values are validated by the SQL constraints; neither a full accounting ledger nor a production banking service is implemented in the examples.
