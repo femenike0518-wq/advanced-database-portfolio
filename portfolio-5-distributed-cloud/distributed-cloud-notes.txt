@@ -1,18 +1,18 @@
-# SwiftBank Distributed and Cloud Database Notes
+SwiftBank Distributed and Cloud Database Notes
 
-## Case study
-SwiftBank is a fictional banking system that stores customers, accounts, balances and transactions. PostgreSQL is the authoritative system for relational data and money movement.
+Case study
+SwiftBank is a fictional banking system that stores customers, accounts, balances and transactions. The industry standard for relational data and financial transactions is PostgreSQL.
 
-## Replication practical
-I inspected PostgreSQL 18.6 replication settings on the primary and recorded `wal_level = replica`, `max_wal_senders = 10` and `hot_standby = on`. I then created a separate local physical standby on port 5433 using `pg_basebackup`. The primary's `pg_stat_replication` showed one client in `streaming` state with `sync_state = async`. A marker written to an isolated demo table on the primary appeared on the standby. A write attempt on the standby was rejected with SQLSTATE `25006`. Removing an accidental extra marker on the primary was also reflected on the standby.
+Replication practical
+I verified PostgreSQL 18.6 replication settings on the primary and recorded `wal_level = replica`, `max_wal_senders = 10` and `hot_standby = on`. I then created a separate local physical standby on port 5433 using `pg_basebackup`. The primary's `pg_stat_replication` showed one client in `streaming` state with `sync_state = async`. A marker written to an isolated demo table on the primary appeared on the standby. A write attempt on the standby was rejected with SQLSTATE `25006`. Removing an accidental extra marker on the primary was also reflected on the standby.
 
-This confirms that local asynchronous streaming replication was active during the practical. It does not show failover, production availability, sustained lag behavior or a cloud deployment. I did not alter SwiftBank's customer, account or transaction tables as part of the replication check.
+This demonstrates that during the practical, local asynchronous streaming replication was operational. Failover, production availability, persistent lag behavior and cloud deployment are not displayed. During the replication check, I didn't make any changes to SwiftBank's customer, account or transaction tables.
 
-## Sharding
-If SwiftBank grew beyond one server's capacity, customer or account identifiers could be considered as shard keys. A transfer between accounts on different shards would need coordinated debits and credits; partial completion could create incorrect balances. This makes cross-shard transaction handling a major design concern.
+Sharding
+Customer or account identifiers might be regarded as shard keys if SwiftBank expanded beyond the capacity of a single server. Coordinated debits and credits would be required for a transfer between accounts on separate shards; incomplete transactions could result in inaccurate balances. Cross-shard transaction handling becomes a significant design issue as a result.
 
-## Consistency and availability
-Banking balances require correct transaction processing. Asynchronous replicas can be stale while WAL changes are in transit, so I would direct reads that need the latest balance to the primary or use a consistency-aware design. Synchronous replication can improve commit durability across nodes but may add latency or reduce write availability when a standby is unavailable. I would require a tested failover process that avoids two writable primaries before production use.
+Consistency and availability
+Accurate transaction processing is necessary for banking balances. I would direct reads that require the most recent balance to the primary or employ a consistency-aware design because asynchronous replicas may become stale while WAL changes are being transmitted. When a standby is unavailable, synchronous replication may increase latency or decrease write availability, but it can also increase commit durability across nodes. Before using it in production, I would need a tried-and-true failover procedure that avoids two writable primaries.
 
-## Cloud considerations
-A managed cloud PostgreSQL service could provide backups, monitoring and managed replicas, but the service configuration, access controls, recovery objectives, data location and cost would need to be evaluated. No cloud service was configured in this practical.
+Cloud considerations
+Backups, monitoring and managed replicas could be offered by a managed cloud PostgreSQL service; however, it would be necessary to assess the service configuration, access controls, recovery goals, data location and cost. In this practical, no cloud service was set up.
