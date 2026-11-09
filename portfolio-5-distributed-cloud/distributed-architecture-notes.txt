@@ -1,12 +1,12 @@
-# SwiftBank Distributed Database Architecture
+ SwiftBank Distributed Database Architecture
 
-## Proposed design
-SwiftBank uses PostgreSQL as its authoritative relational database. Account updates and money movement are written to the primary. A standby can receive WAL changes and support read-only access or recovery planning, subject to replication lag and a tested failover process.
+ Proposed design
+PostgreSQL is the authoritative relational database used by SwiftBank. Money transfers and account updates are sent to the primary. Subject to replication lag and a tested failover procedure, a standby can accept WAL modifications and facilitate read-only access or recovery planning.
 
-## Practical implementation
-I configured a separate local PostgreSQL 18.6 physical standby using `pg_basebackup`. The existing server remained the primary on port 5432; the standby used a separate data directory and port 5433. The primary reported the standby as `streaming` with asynchronous replication. A marker written to an isolated `p5_replication_demo` table appeared on the standby, and PostgreSQL rejected a standby write with SQLSTATE `25006`. This verifies local streaming and read-only behavior. I did not promote the standby or test failover.
+Practical implementation
+I used `pg_basebackup` to set up a different local PostgreSQL 18.6 physical standby. The standby used a different data directory and port 5433, while the current server continued to be the primary on port 5432. The standby was described by the primary as "streaming" with asynchronous replication. PostgreSQL rejected a standby write with SQLSTATE `25006` after a marker written to an isolated `p5_replication_demo` table appeared on the standby. This confirms read-only behavior and local streaming. I didn't advertise the test failover or standby.
 
-## Design considerations
-Asynchronous replication can leave recent changes unavailable on a standby during lag or a primary failure. I would keep SwiftBank balance-changing transactions on the primary and monitor replication health before relying on replicas. Synchronous replication could reduce the risk of losing acknowledged commits, but it can increase latency and make writes depend on standby availability. I would require a tested failover process to prevent two writable primaries.
+Design considerations
+Recent changes may not be accessible on a standby during lag or a primary failure due to asynchronous replication. Before depending on replicas, I would keep SwiftBank balance-changing transactions on the primary and keep an eye on the health of the replicas. Although synchronous replication can increase latency and make writes dependent on standby availability, it may lessen the chance of losing acknowledged commits. To avoid two writable primaries, I would need a tried-and-true failover procedure.
 
-Sharding could distribute customers or accounts by a stable customer/account key as data grows. Transfers between shards would require coordination across both sides of the transfer, making atomic money movement more complex. I did not implement sharding or cloud deployment.
+As data grows, sharding may be used to distribute customers or accounts according to a stable customer/account key. Atomic money movement would become more complicated if transfers between shards required coordination on both sides. I didn't use cloud deployment or sharding.
