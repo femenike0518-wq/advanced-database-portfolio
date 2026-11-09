@@ -1,5 +1,7 @@
  MIT 8103 Advanced Database Systems Portfolio
 
+**GitHub repository:** [advanced-database-portfolio](https://github.com/femenike0518-wq/advanced-database-portfolio)
+
  Selected case study: SwiftBank
 
 SwiftBank is a fictional banking system to handle customers with both savings and current accounts. The database can be used by customers, bank staff, and administrators. The database contains customer details (contact information), their account, balance, transaction type, amount, status, date and account reference. The system allows for account creation/maintenance, deposits, withdrawals, transfers, viewing transaction history and checking transactions.
