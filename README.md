@@ -1,10 +1,10 @@
-# MIT 8103 Advanced Database Systems Portfolio
+ MIT 8103 Advanced Database Systems Portfolio
 
-## Selected case study: SwiftBank
+ Selected case study: SwiftBank
 
-SwiftBank is a fictional banking system for customers who hold savings and current accounts. Customers, bank staff and administrators use its database. It stores customer contact details, accounts and balances, and transaction types, amounts, statuses, dates and account references. Supported operations include opening and maintaining accounts, depositing, withdrawing, transferring funds, viewing transaction history and reviewing transactions.
+SwiftBank is a fictional banking system to handle customers with both savings and current accounts. The database can be used by customers, bank staff, and administrators. The database contains customer details (contact information), their account, balance, transaction type, amount, status, date and account reference. The system allows for account creation/maintenance, deposits, withdrawals, transfers, viewing transaction history and checking transactions.
 
-## Portfolio guide
+ Portfolio guide
 
 | Portfolio | Focus | Start here |
 | --- | --- | --- |
@@ -16,7 +16,7 @@ SwiftBank is a fictional banking system for customers who hold savings and curre
 
 Each portfolio README identifies the work, its evidence and relevant limitations.
 
-## Repository map
+ Repository map
 
 | Path | Contents |
 | --- | --- |
@@ -26,24 +26,26 @@ Each portfolio README identifies the work, its evidence and relevant limitations
 | [portfolio-4-nosql/](portfolio-4-nosql/) | MongoDB document example. Commands in `mongodb/`, screenshots in `evidence/`. |
 | [portfolio-5-distributed-cloud/](portfolio-5-distributed-cloud/) | PostgreSQL 18.6 local asynchronous streaming standby, verification scripts and distributed/cloud design notes. PowerShell setup instructions are in the P5 README; screenshots are in `evidence/`. |
 
-## Tools
+ Tools
 
-- PostgreSQL 18.6 and pgAdmin for relational design, query plans, transaction tests and local replication.
-- MongoDB Community Server and `mongosh` for the SwiftBank document example.
-- Git and GitHub for version control and evidence storage.
+- PostgreSQL (18.6) – For relational database design, query planning, transaction testing and local replication.
 
-## AI-use declaration
+- MongoDB Community Server – To run the SwiftBank document example using `mongosh`.
 
-### Tools used
+- Git + GitHub – For version control and storing evidence.
 
-I used ChatGPT and Codex while completing this portfolio.
+ AI-use declaration
 
-### What I used each tool for
+ Tools used
 
-I used ChatGPT to understand the assignment and the tasks I needed to complete. I used Codex to help build my portfolios, correct mistakes, review my work and draft my final documentation. I also used Codex to help organize portfolio files into SQL, MongoDB and evidence folders, and rename screenshot and script files so my README links remained accurate.
+ChatGPT and Codex were utilized when completing this portfolio.
 
-### How I reviewed and verified the work
+ What I used each tool for
 
-I ran every SQL and MongoDB script on my own PostgreSQL 18.6 and MongoDB instances, checked results against expected values, reviewed the negative tests, checked query result parity, and captured my own screenshots. I checked the README links after organizing and renaming the files. I reviewed the AI-assisted work and took responsibility for the submitted portfolio and its explanations.
+ChatGPT was used to help understand what the task was asking me to do. Codex was used to help create my portfolios, fix any errors, check my work and help write the final documentation. Codex was also used to help sort my portfolio into the different sections (SQL, MongoDB, Evidence). This involved renaming the screenshot and script files so that the links in the README would still be correct.
 
-Codex helped draft my final documentation. I reviewed that wording and am responsible for its accuracy.
+ How I reviewed and verified the work
+
+All scripts (SQL and MongoDB) were executed on my own instances of PostgreSQL 18.6 and MongoDB. Checked that everything was returning the correct values. Negative testing was done. Checked that queries were returning consistent results. Screenshots were taken by me. Checked links in README. After organizing and renaming files. Checked work done with AI assistance. I take responsibility for the work in my portfolio.
+
+My final documentation was drafted with Codex's assistance. I am accountable for the accuracy of that wording after reviewing it.
